@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light"><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwMjU0NDQzNjU4NzI4ODI1NjQ3MSIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjXzQ4YTE5MzZmZDNiNTI4YzNfNTA4YmNhZWJfaW5kZXguaHRtbC04NzcifSwiZXhwIjoxNzk1MDgwNjYyLCJpYXQiOjE3OTUwNzcwNjIsImFsZyI6IlJTMjU2In0.LLMZDPfv4ZkI9Hy-nY-xTgT0Z4VzUxQA9aL8-8LgIhbvn5id7Ggxb6ZcbTSENnIhZXZq4ku8WQ7VEW8rgENwOzW6e2QJ_5hazhQK1xl9wd8r4uduqz8BxZ_kQaf_mkkXXLhWda0nor9TjbaQLXIDK1iLKY57gBxsculFMJC-eTSp02XlC947BkH_QAt8490S3__8TOPgWai4_X9HPXiyy4Jxv73ffwU1gnl9nlV2JqHX8kWLGQtuw2-KVFwhh0RnxwI01-8INlhpjYUHUgrV0iRtXH-N-riRuRtCF224inyyTqf9d-BCYMvaF93f_Hgte-62dCQpFFLP242Y5WJItA","c_48a1936fd3b528c3_508bcaeb_index.html-877")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.i=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.extensions="";var l=0,t=null,r=null,q=[],F=new TextEncoder,
+G=new TextDecoder;c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*
+16|0;return(f==="x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;
+(g=t)==null||g.postMessage(a)}};Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function() {
+  const OVERLAY_SELECTOR =
+    'dialog[open], [role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], [role="combobox"]';
+
+  function isVisibleOverlay(element) {
+    if (element.closest('[hidden], [aria-hidden="true"], [inert]')) {
+      return false;
+    }
+    if (window.getComputedStyle(element).visibility === 'hidden') {
+      return false;
+    }
+    for (let cur = element; cur; cur = cur.parentElement) {
+      if (window.getComputedStyle(cur).display === 'none') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function hasOpenOverlay() {
+    const candidates = document.querySelectorAll(OVERLAY_SELECTOR);
+    for (let i = 0; i < candidates.length; i++) {
+      if (isVisibleOverlay(candidates[i])) {
+        return true;
+      }
+    }
+    try {
+      if (document.querySelector('[popover]:popover-open')) {
+        return true;
+      }
+    } catch (e) {
+      // Ignore engines that do not support :popover-open.
+    }
+    return false;
+  }
+
+  function isNonEmptySearchInput(target) {
+    return (
+      Boolean(target) &&
+      target.tagName === 'INPUT' &&
+      typeof target.type === 'string' &&
+      target.type.toLowerCase() === 'search' &&
+      typeof target.value === 'string' &&
+      target.value.length > 0
+    );
+  }
+
+  function shouldIgnoreEscape(event) {
+    return (
+      event.key !== 'Escape' ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      event.isComposing ||
+      event.repeat ||
+      event.keyCode === 229 ||
+      isNonEmptySearchInput(event.target)
+    );
+  }
+
+  let shouldIgnoreCaptureState = false;
+
+  window.addEventListener(
+    'keydown',
+    function(event) {
+      if (event.key === 'Escape') {
+        shouldIgnoreCaptureState =
+          hasOpenOverlay() || isNonEmptySearchInput(event.target);
+      }
+    },
+    {capture: true},
+  );
+
+  window.addEventListener('keydown', function(event) {
+    if (
+      shouldIgnoreEscape(event) ||
+      event.defaultPrevented ||
+      shouldIgnoreCaptureState
+    ) {
+      return;
+    }
+    const wasBlockedOnCapture = shouldIgnoreCaptureState;
+    queueMicrotask(function() {
+      if (event.defaultPrevented || wasBlockedOnCapture) {
+        return;
+      }
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({'type': 'escapeKey'}, '*');
+      }
+    });
+  });
+})();</script><script data-bard-client-injected="true">(function() {
+  function normalizeSlug(str) {
+    try {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^p{L}p{N}s_-]/gu, '')
+        .replace(/s+/g, '-');
+    } catch (e) {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9s_-]/g, '')
+        .replace(/s+/g, '-');
+    }
+  }
+
+  function findTargetElement(hash) {
+    if (!hash || hash === '#') {
+      return null;
+    }
+    const rawId = hash.startsWith('#') ? hash.slice(1) : hash;
+    let decodedId = rawId;
+    try {
+      decodedId = decodeURIComponent(rawId);
+    } catch (e) {
+      // Ignore URI malformed errors.
+    }
+
+    // 1. Direct ID match (raw and decoded).
+    let target = document.getElementById(rawId) || document.getElementById(decodedId);
+    if (target) {
+      return target;
+    }
+
+    // 2. Name attribute match (<a name="...">).
+    try {
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        target =
+          document.querySelector('[name="' + CSS.escape(rawId) + '"]') ||
+          document.querySelector('[name="' + CSS.escape(decodedId) + '"]');
+      } else {
+        const namedElements = document.getElementsByName(rawId);
+        if (namedElements && namedElements.length > 0) {
+          return namedElements[0];
+        }
+      }
+    } catch (e) {
+      // Ignore querySelector syntax errors.
+    }
+    if (target) {
+      return target;
+    }
+
+    // 3. Match heading text by slug (for Markdown TOCs where headings lack explicit IDs).
+    const targetSlug = normalizeSlug(decodedId);
+    if (targetSlug) {
+      for (const heading of document.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+        if (normalizeSlug(heading.textContent || '') === targetSlug) {
+          return heading;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    const anchor = target && typeof target.closest === 'function' ? target.closest('a') : null;
+    if (!anchor) {
+      return;
+    }
+
+    const href = anchor.getAttribute('href');
+    if (
+      !href ||
+      href.trim().toLowerCase().startsWith('javascript:') ||
+      anchor.hasAttribute('download')
+    ) {
+      return;
+    }
+
+    // Check if the link is an in-page hash / anchor link.
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const targetElement = findTargetElement(href);
+      if (targetElement) {
+        targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+      return;
+    }
+
+    // Check if the URL has the same origin/pathname but with a hash.
+    try {
+      const url = new URL(anchor.href, window.location.href);
+      if (
+        url.hash &&
+        url.origin === window.location.origin &&
+        url.pathname === window.location.pathname
+      ) {
+        event.preventDefault();
+        const targetElement = findTargetElement(url.hash);
+        if (targetElement) {
+          targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+        return;
+      }
+    } catch (e) {
+      // Fall through if URL parsing fails.
+    }
+
+    // For all external or full navigation links, prevent iframe-level navigation
+    // (which breaks in AGSA WebView or sandboxed iframes) and ensure they open
+    // safely in a new tab/window.
+    if (anchor.target !== '_blank') {
+      event.preventDefault();
+      window.open(anchor.href, '_blank', 'noopener,noreferrer');
+    }
+  }, {capture: true});
+})();</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 每日趣味资讯看板 · AI Daily Pulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; }
+    .kanban-scroll::-webkit-scrollbar { height: 8px; width: 6px; }
+    .kanban-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.45); border-radius: 9999px; }
+    .card-hover { transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease; }
+    .card-hover:hover { transform: translateY(-2px); }
+    .dragging { opacity: 0.55; transform: scale(0.98); }
+    .drop-active { outline: 2px dashed #6366f1; outline-offset: -4px; background-color: rgba(99, 102, 241, 0.06); }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, Noto Sans SC, system-ui, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.bottom-5{bottom:1.25rem}.left-3{left:0.75rem}.right-5{right:1.25rem}.top-0{top:0px}.top-1\/2{top:50%}.z-30{z-index:30}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-1\.5{margin-bottom:0.375rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-64{height:16rem}.max-h-\[90vh\]{max-height:90vh}.min-h-screen{min-height:100vh}.min-h-\[260px\]{min-height:260px}.w-10{width:2.5rem}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-7xl{max-width:80rem}.max-w-xl{max-width:36rem}.flex-1{flex:1 1 0%}.-translate-y-1\/2{--tw-translate-y:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-2\.5{gap:0.625rem}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.overflow-y-auto{overflow-y:auto}.whitespace-nowrap{white-space:nowrap}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.rounded{border-radius:0.25rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-t-4{border-top-width:4px}.border-amber-200\/80{border-color:rgb(253 230 138 / 0.8)}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-200\/70{border-color:rgb(226 232 240 / 0.7)}.border-slate-200\/80{border-color:rgb(226 232 240 / 0.8)}.border-amber-200\/60{border-color:rgb(253 230 138 / 0.6)}.border-slate-100{--tw-border-opacity:1;border-color:rgb(241 245 249 / var(--tw-border-opacity, 1))}.border-slate-200\/90{border-color:rgb(226 232 240 / 0.9)}.border-t-amber-500{--tw-border-opacity:1;border-top-color:rgb(245 158 11 / var(--tw-border-opacity, 1))}.border-t-emerald-500{--tw-border-opacity:1;border-top-color:rgb(16 185 129 / var(--tw-border-opacity, 1))}.border-t-indigo-500{--tw-border-opacity:1;border-top-color:rgb(99 102 241 / var(--tw-border-opacity, 1))}.border-t-red-500{--tw-border-opacity:1;border-top-color:rgb(239 68 68 / var(--tw-border-opacity, 1))}.border-t-rose-500{--tw-border-opacity:1;border-top-color:rgb(244 63 94 / var(--tw-border-opacity, 1))}.border-t-violet-500{--tw-border-opacity:1;border-top-color:rgb(139 92 246 / var(--tw-border-opacity, 1))}.bg-amber-50\/90{background-color:rgb(255 251 235 / 0.9)}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-indigo-100{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/60{background-color:rgb(15 23 42 / 0.6)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/90{background-color:rgb(255 255 255 / 0.9)}.bg-amber-100{--tw-bg-opacity:1;background-color:rgb(254 243 199 / var(--tw-bg-opacity, 1))}.bg-amber-50\/80{background-color:rgb(255 251 235 / 0.8)}.bg-emerald-100{--tw-bg-opacity:1;background-color:rgb(209 250 229 / var(--tw-bg-opacity, 1))}.bg-red-100{--tw-bg-opacity:1;background-color:rgb(254 226 226 / var(--tw-bg-opacity, 1))}.bg-rose-100{--tw-bg-opacity:1;background-color:rgb(255 228 230 / var(--tw-bg-opacity, 1))}.bg-slate-100\/80{background-color:rgb(241 245 249 / 0.8)}.bg-violet-100{--tw-bg-opacity:1;background-color:rgb(237 233 254 / var(--tw-bg-opacity, 1))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.from-indigo-500{--tw-gradient-from:#6366f1 var(--tw-gradient-from-position);--tw-gradient-to:rgb(99 102 241 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-violet-500{--tw-gradient-to:rgb(139 92 246 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #8b5cf6 var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-fuchsia-500{--tw-gradient-to:#d946ef var(--tw-gradient-to-position)}.p-1{padding:0.25rem}.p-1\.5{padding:0.375rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-3\.5{padding:0.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.pb-3{padding-bottom:0.75rem}.pl-8{padding-left:2rem}.pr-3{padding-right:0.75rem}.pt-1{padding-top:0.25rem}.pt-4{padding-top:1rem}.text-left{text-align:left}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.text-\[11px\]{font-size:11px}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-relaxed{line-height:1.625}.leading-snug{line-height:1.375}.leading-none{line-height:1}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.text-amber-800{--tw-text-opacity:1;color:rgb(146 64 14 / var(--tw-text-opacity, 1))}.text-amber-950{--tw-text-opacity:1;color:rgb(69 26 3 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.text-rose-600{--tw-text-opacity:1;color:rgb(225 29 72 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-amber-700{--tw-text-opacity:1;color:rgb(180 83 9 / var(--tw-text-opacity, 1))}.text-amber-900{--tw-text-opacity:1;color:rgb(120 53 15 / var(--tw-text-opacity, 1))}.text-emerald-700{--tw-text-opacity:1;color:rgb(4 120 87 / var(--tw-text-opacity, 1))}.text-red-700{--tw-text-opacity:1;color:rgb(185 28 28 / var(--tw-text-opacity, 1))}.text-rose-700{--tw-text-opacity:1;color:rgb(190 18 60 / var(--tw-text-opacity, 1))}.text-violet-700{--tw-text-opacity:1;color:rgb(109 40 217 / var(--tw-text-opacity, 1))}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.hover\:border-indigo-500:hover{--tw-border-opacity:1;border-color:rgb(99 102 241 / var(--tw-border-opacity, 1))}.hover\:border-indigo-300:hover{--tw-border-opacity:1;border-color:rgb(165 180 252 / var(--tw-border-opacity, 1))}.hover\:bg-amber-50:hover{--tw-bg-opacity:1;background-color:rgb(255 251 235 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-700:hover{--tw-bg-opacity:1;background-color:rgb(4 120 87 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-100:hover{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-200:hover{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-100:hover{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.hover\:text-slate-900:hover{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.hover\:underline:hover{-webkit-text-decoration-line:underline;text-decoration-line:underline}.hover\:shadow-md:hover{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-indigo-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(99 102 241 / var(--tw-ring-opacity, 1))}.dark\:border-amber-800\/60:is(.dark *){border-color:rgb(146 64 14 / 0.6)}.dark\:border-slate-700:is(.dark *){--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.dark\:border-slate-800:is(.dark *){--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.dark\:border-amber-800\/40:is(.dark *){border-color:rgb(146 64 14 / 0.4)}.dark\:border-slate-700\/70:is(.dark *){border-color:rgb(51 65 85 / 0.7)}.dark\:border-slate-700\/80:is(.dark *){border-color:rgb(51 65 85 / 0.8)}.dark\:bg-amber-950\/30:is(.dark *){background-color:rgb(69 26 3 / 0.3)}.dark\:bg-indigo-950:is(.dark *){--tw-bg-opacity:1;background-color:rgb(30 27 75 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-700:is(.dark *){--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-800:is(.dark *){--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-800\/70:is(.dark *){background-color:rgb(30 41 59 / 0.7)}.dark\:bg-slate-800\/80:is(.dark *){background-color:rgb(30 41 59 / 0.8)}.dark\:bg-slate-900:is(.dark *){--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-900\/90:is(.dark *){background-color:rgb(15 23 42 / 0.9)}.dark\:bg-slate-950:is(.dark *){--tw-bg-opacity:1;background-color:rgb(2 6 23 / var(--tw-bg-opacity, 1))}.dark\:bg-white:is(.dark *){--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.dark\:bg-amber-950\/60:is(.dark *){background-color:rgb(69 26 3 / 0.6)}.dark\:bg-emerald-950\/60:is(.dark *){background-color:rgb(2 44 34 / 0.6)}.dark\:bg-indigo-950\/60:is(.dark *){background-color:rgb(30 27 75 / 0.6)}.dark\:bg-red-950\/60:is(.dark *){background-color:rgb(69 10 10 / 0.6)}.dark\:bg-rose-950\/60:is(.dark *){background-color:rgb(76 5 25 / 0.6)}.dark\:bg-slate-800\/95:is(.dark *){background-color:rgb(30 41 59 / 0.95)}.dark\:bg-slate-900\/70:is(.dark *){background-color:rgb(15 23 42 / 0.7)}.dark\:bg-violet-950\/60:is(.dark *){background-color:rgb(46 16 101 / 0.6)}.dark\:text-amber-100:is(.dark *){--tw-text-opacity:1;color:rgb(254 243 199 / var(--tw-text-opacity, 1))}.dark\:text-amber-300:is(.dark *){--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.dark\:text-emerald-400:is(.dark *){--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.dark\:text-indigo-300:is(.dark *){--tw-text-opacity:1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}.dark\:text-indigo-400:is(.dark *){--tw-text-opacity:1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}.dark\:text-rose-400:is(.dark *){--tw-text-opacity:1;color:rgb(251 113 133 / var(--tw-text-opacity, 1))}.dark\:text-slate-100:is(.dark *){--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.dark\:text-slate-300:is(.dark *){--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.dark\:text-slate-400:is(.dark *){--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.dark\:text-slate-900:is(.dark *){--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.dark\:text-amber-200:is(.dark *){--tw-text-opacity:1;color:rgb(253 230 138 / var(--tw-text-opacity, 1))}.dark\:text-emerald-300:is(.dark *){--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.dark\:text-red-300:is(.dark *){--tw-text-opacity:1;color:rgb(252 165 165 / var(--tw-text-opacity, 1))}.dark\:text-rose-300:is(.dark *){--tw-text-opacity:1;color:rgb(253 164 175 / var(--tw-text-opacity, 1))}.dark\:text-slate-200:is(.dark *){--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.dark\:text-violet-300:is(.dark *){--tw-text-opacity:1;color:rgb(196 181 253 / var(--tw-text-opacity, 1))}.dark\:hover\:border-indigo-700:hover:is(.dark *){--tw-border-opacity:1;border-color:rgb(67 56 202 / var(--tw-border-opacity, 1))}.dark\:hover\:bg-amber-950\/40:hover:is(.dark *){background-color:rgb(69 26 3 / 0.4)}.dark\:hover\:bg-slate-700:hover:is(.dark *){--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.dark\:hover\:bg-slate-800:hover:is(.dark *){--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.dark\:hover\:bg-indigo-900\/60:hover:is(.dark *){background-color:rgb(49 46 129 / 0.6)}.dark\:hover\:text-white:hover:is(.dark *){--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\:w-64{width:16rem}.sm\:flex-initial{flex:0 1 auto}.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:p-5{padding:1.25rem}.sm\:p-6{padding:1.5rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}}@media (min-width: 768px){.md\:flex{display:flex}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}</style></head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200">
+  <!-- Top Header -->
+  <header class="sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 flex items-center justify-center text-white text-xl shadow-sm">
+          ⚡
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight">AI 每日趣味资讯看板</h1>
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+              早 09:00 · 晚 20:00 增量更新
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            全网搜罗 · 趣味锐评 · 历史档案自动留存
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <button id="toggleChartBtn" type="button" class="px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
+          <span>📊</span><span>模型天梯速览</span>
+        </button>
+        <button id="openImportBtn" type="button" class="px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition flex items-center gap-1.5">
+          <span>＋</span><span>导入新期 / 新增</span>
+        </button>
+        <button id="openGithubKitBtn" type="button" class="px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition flex items-center gap-1.5">
+          <span>🤖</span><span>下载全自动脚本</span>
+        </button>
+        <button id="exportBtn" type="button" class="px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center gap-1.5">
+          <span>💾</span><span>导出备份</span>
+        </button>
+        <button id="themeToggleBtn" type="button" aria-label="切换深浅色主题" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-sm">🌙</button>
+      </div>
+    </div>
+
+    <!-- Filter & Mode Toolbar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- Board Mode Switch -->
+        <div class="inline-flex rounded-lg p-1 bg-slate-100 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700">
+          <button id="modeCategoryBtn" type="button" class="px-3 py-1 text-xs font-semibold rounded-md transition bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm">
+            🗂️ 按栏目看板
+          </button>
+          <button id="modeStatusBtn" type="button" class="px-3 py-1 text-xs font-semibold rounded-md transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+            ✅ 按阅读进度
+          </button>
+        </div>
+
+        <!-- Edition / History Selector -->
+        <select id="editionSelect" class="text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"><option value="ALL">📚 全部往期档案 (17 条)</option><option value="2026-11-18 晚间首发版">2026-11-18 晚间首发版 (17)</option></select>
+
+        <!-- Starred Filter -->
+        <button id="starFilterBtn" type="button" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition flex items-center gap-1">
+          <span>⭐</span><span>仅看收藏</span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3 flex-1 sm:flex-initial justify-end">
+        <div class="relative w-full sm:w-64">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+          <input id="searchInput" type="text" placeholder="搜索模型、厂商、关键词..." class="w-full pl-8 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div id="statsSummary" class="hidden md:flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap"><span>共 <strong>17</strong> 条留存</span><span>·</span><span>收藏 <strong>5</strong></span><span>·</span><span>已归档 <strong>0</strong></span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Collapsible Model Radar Chart Panel -->
+  <section id="chartPanel" class="hidden max-w-7xl mx-auto px-4 sm:px-6 pt-4">
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div>
+          <h2 class="text-sm sm:text-base font-bold">📈 2026 年 11 月热门模型：Intelligence 评分 vs 输入价格 ($/1M tokens)</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">数据来源：Opper AI Model Release Tracker &amp; Google Blog (2026年11月)</p>
+        </div>
+        <button id="closeChartBtn" type="button" class="text-xs px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700">收起</button>
+      </div>
+      <div class="relative h-64 w-full">
+        <canvas id="modelChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Kanban Board -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-5">
+    <div id="categoryPills" class="flex items-center gap-2 flex-wrap mb-4"><button type="button" class="px-3 py-1.5 text-xs font-semibold rounded-full bg-indigo-600 text-white shadow-sm transition">全部栏目 (17)</button><button type="button" class="px-3 py-1.5 text-xs font-medium rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">🔥 今日爆点 (2)</button><button type="button" class="px-3 py-1.5 text-xs font-medium rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">🇨🇳 中国 AI 动态 (4)</button><button type="button" class="px-3 py-1.5 text-xs font-medium rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">🐙 GitHub 每日开源Top5 (5)</button><button type="button" class="px-3 py-1.5 text-xs font-medium rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">🧠 模型与硬件 (2)</button><button type="button" class="px-3 py-1.5 text-xs font-medium rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">🛠️ 开源与工具 (2)</button><button type="button" class="px-3 py-1.5 text-xs font-medium rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">🎭 趣闻与合规 (2)</button></div>
+    <div id="kanbanBoard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start"><section class="rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 border-t-4 border-t-rose-500 p-3 flex flex-col gap-3 min-h-[260px]" data-col-id="hot"><div class="flex items-center justify-between px-1">
+            <h3 class="text-sm font-bold tracking-tight">🔥 今日爆点</h3>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700">2</span>
+          </div><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">OpenAI</span>
+                  <span class="text-[11px] text-slate-400">2026-11-18</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">⭐</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">GPT-6.2 Astra &amp; Sol 登场，ChatGPT 语音也取消 10 分钟限制</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>以前 AI 写代码像实习生，现在 Astra 和 Sol 连财务月结报表都接管了，连语音吐槽都能无限时长不断线！</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 95</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">Google DeepMind</span>
+                  <span class="text-[11px] text-slate-400">2026-11-16</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">⭐</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">Gemini 4 Hydrogen 发布：把 Google Sheets 玩成全动态像素画布</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>谁能想到有一天电子表格能拿来放像素动画？Hydrogen 还用实时全球闪电数据做出了 3D 地球音乐盒！</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 97</span>
+              </div></div></article></section><section class="rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 border-t-4 border-t-red-500 p-3 flex flex-col gap-3 min-h-[260px]" data-col-id="china"><div class="flex items-center justify-between px-1">
+            <h3 class="text-sm font-bold tracking-tight">🇨🇳 中国 AI 动态</h3>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700">4</span>
+          </div><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300">WorkBuddy</span>
+                  <span class="text-[11px] text-slate-400">2026-11-17</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">⭐</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">WorkBuddy 5.11.4 更新：定时任务与 Office/MCP 稳定性再升级</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>打工人专属 AI 办公搭子把定时任务、Markdown 分块预览和高积分确认都打磨得更稳了。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 91</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300">字节跳动 · 豆包</span>
+                  <span class="text-[11px] text-slate-400">2026-11-17</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">豆包更新至 15.8.0，Seedance 2.0 视频生成模型全面免费开放</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>不仅能写文案改代码，现在登录豆包还能直接免费玩 Seedance 2.0 做视频、让桌面端帮你操作电脑。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 93</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300">DeepSeek</span>
+                  <span class="text-[11px] text-slate-400">2026-11-13</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">⭐</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">DeepSeek 发布 Full-Suite App API，V4.1-Flash-1017 同步全端上线</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>主打“许愿式编程一键成真”，还坚持闲时半价的峰谷定价，性价比党狂喜。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 94</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300">阿里 / 腾讯 / 月之暗面</span>
+                  <span class="text-[11px] text-slate-400">2026-11-16</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">国产大模型 11 月连发：Qwen4-Max 百万上下文仅 $1.50，腾讯 Hy4 登场</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>百万上下文直接打到白菜价，国产模型在长文本和价格战上依然卷得飞起。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 89</span>
+              </div></div></article></section><section class="rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 border-t-4 border-t-violet-500 p-3 flex flex-col gap-3 min-h-[260px]" data-col-id="github"><div class="flex items-center justify-between px-1">
+            <h3 class="text-sm font-bold tracking-tight">🐙 GitHub 每日开源Top5</h3>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700">5</span>
+          </div><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300">⭐ 394.8k Stars</span>
+                  <span class="text-[11px] text-slate-400">2026-11-18</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">⭐</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">openclaw/openclaw：跨平台真正替你动手干活的 AI 智能体</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>39.4 万星的开源界顶流，主打“不光动嘴聊天，而是直接在任何系统上帮你把活干了”。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 98</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300">⭐ 196.8k Stars</span>
+                  <span class="text-[11px] text-slate-400">2026-11-18</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">microsoft/markitdown：把一切办公文档转成大模型最爱的 Markdown</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>近 20 万星的刚需神器，喂给 AI 之前先用它洗一遍 PDF 和文档，效果立竿见影。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 95</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300">⭐ 184.4k Stars</span>
+                  <span class="text-[11px] text-slate-400">2026-11-18</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">ollama/ollama：一条命令在本地免费跑起最新开源大模型</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>18.4 万星的本地 AI 装机必备，想自己白嫖跑模型基本绕不开它。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 96</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300">⭐ 149.9k Stars</span>
+                  <span class="text-[11px] text-slate-400">2026-11-18</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">langchain-ai/langchain：大模型应用与 Agent 工程的万能乐高积木</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>14.9 万星的常青树底座，想把模型、知识库和工具链拼成完整应用就靠它。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 90</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300">🔥 今日 +1,917 Stars</span>
+                  <span class="text-[11px] text-slate-400">2026-11-18</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">obra/superpowers：把开发流程变成 AI 可直接执行的“超能力技能包”</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>今日狂涨近两千星的新晋黑马，让 AI 写代码不再东一榔头西一棒槌。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 94</span>
+              </div></div></article></section><section class="rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 border-t-4 border-t-indigo-500 p-3 flex flex-col gap-3 min-h-[260px]" data-col-id="models"><div class="flex items-center justify-between px-1">
+            <h3 class="text-sm font-bold tracking-tight">🧠 模型与硬件</h3>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700">2</span>
+          </div><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">NVIDIA / ASUS / Dell / MSI</span>
+                  <span class="text-[11px] text-slate-400">2026-11-18</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">NVIDIA RTX Spark 迷你桌面主机开售：桌角本地跑 120B 模型</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>以前跑 1200 亿参数模型得租机房，现在直接塞进显示器旁的小主机——就是 $4,699 起步的售价也很“核弹”。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 91</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">Anthropic / Alibaba</span>
+                  <span class="text-[11px] text-slate-400">2026-11-16</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">11 月模型榜“神仙打架”：Claude Fable 5.2 与 Qwen4-Max 同台</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>一边是 65 分旗舰拼智商天花板，一边是 $1.50 级选手拼性价比，11 月才过半已经发了 18 个新模型。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 88</span>
+              </div></div></article></section><section class="rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 border-t-4 border-t-emerald-500 p-3 flex flex-col gap-3 min-h-[260px]" data-col-id="tools"><div class="flex items-center justify-between px-1">
+            <h3 class="text-sm font-bold tracking-tight">🛠️ 开源与工具</h3>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700">2</span>
+          </div><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">开源社区 / GitHub</span>
+                  <span class="text-[11px] text-slate-400">2026-11-17</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">DeepSeek Harness 破 27.9 万星，100 行代码的 mini-SWE-agent 走红</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>谁说 Agent 框架一定要写几万行？100 行 Python 配一个 Bash 终端，照样让大厂工程师天天拿来干活。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 93</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">MIT CSAIL &amp; NYU</span>
+                  <span class="text-[11px] text-slate-400">2026-11-09</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">MIT 研发 FLEX：喊一句“别洒笔记本上”，机器人自己躲开手机</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>机器人终于学会“举一反三”了！不用把家里每个贵重物品都写进代码，它自己就能悟出电子产品都怕水。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 94</span>
+              </div></div></article></section><section class="rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 border-t-4 border-t-amber-500 p-3 flex flex-col gap-3 min-h-[260px]" data-col-id="fun"><div class="flex items-center justify-between px-1">
+            <h3 class="text-sm font-bold tracking-tight">🎭 趣闻与合规</h3>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700">2</span>
+          </div><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300">OpenAI</span>
+                  <span class="text-[11px] text-slate-400">2026-11-13</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">ChatGPT Wallet 上线：AI 代理挑好毛衣后直接刷 Face ID 结账</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>AI 从“帮我写周报”正式进化到“帮我花钱”。唯一需要防备的是，以后逛网店可能连下单键都不用自己点了。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 92</span>
+              </div></div></article><article class="card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5"><div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300">Microsoft / California</span>
+                  <span class="text-[11px] text-slate-400">2026-11-18</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">☆</button>
+              </div><h4 class="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">微软启动 AI 透明度倡议 &amp; 加州推进 SB 813 强制安全标准</h4><div class="text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed"><span class="font-semibold">🌶️ 锐评：</span>AI 智能体在前面狂飙，企业合规和地方法规也在同步给它们装“安全带”和“红绿灯”。</div><div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400"><button type="button" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition" title="点击切换阅读进度">👀 待看</button><div class="flex items-center gap-2">
+                
+                <span>趣味 84</span>
+              </div></div></article></section></div>
+  </main>
+
+  <!-- Card Detail Modal -->
+  <div id="detailModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-5 sm:p-6">
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2 flex-wrap" id="modalBadges"></div>
+        <button id="closeDetailBtn" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">✕</button>
+      </div>
+      <h2 id="modalTitle" class="text-lg sm:text-xl font-bold leading-snug mb-3"></h2>
+
+      <div class="rounded-xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 p-3.5 mb-4">
+        <div class="text-xs font-bold text-amber-800 dark:text-amber-300 mb-1">💡 趣味锐评</div>
+        <p id="modalFunTake" class="text-sm text-amber-950 dark:text-amber-100 leading-relaxed"></p>
+      </div>
+
+      <div class="mb-4">
+        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">核心事实与细节</div>
+        <p id="modalSummary" class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed"></p>
+      </div>
+
+      <div class="mb-4">
+        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">信息来源</div>
+        <div id="modalSources" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <div class="border-t border-slate-200 dark:border-slate-800 pt-4 mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <span class="text-xs font-semibold text-slate-500">阅读状态与收藏</span>
+          <button id="modalStarBtn" type="button" class="px-3 py-1 text-xs font-medium rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition"></button>
+        </div>
+        <div class="flex flex-wrap gap-2" id="modalStatusBtns"></div>
+      </div>
+
+      <div>
+        <label for="modalNoteInput" class="block text-xs font-semibold text-slate-500 mb-1.5">📝 我的随手笔记（自动保存至浏览器本地档案）</label>
+        <textarea id="modalNoteInput" rows="3" placeholder="记录你的想法、待测试的链接或灵感..." class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        <div class="flex justify-end mt-2">
+          <button id="saveNoteBtn" type="button" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition">保存笔记</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import / Add New Edition Modal -->
+  <div id="importModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-5 sm:p-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-bold">📥 导入新期资讯 / 手动新增卡片</h2>
+        <button id="closeImportBtn" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">✕</button>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">
+        每天 09:00 / 20:00 收到新一期资讯后，可在此粘贴 JSON 追加到看板；系统会自动去重，保留你之前所有的搜索资料和笔记。
+      </p>
+
+      <div class="inline-flex rounded-lg p-1 bg-slate-100 dark:bg-slate-800 mb-4">
+        <button id="tabJsonImport" type="button" class="px-3 py-1 text-xs font-semibold rounded-md bg-white dark:bg-slate-700 shadow-sm">批量 JSON 导入</button>
+        <button id="tabManualAdd" type="button" class="px-3 py-1 text-xs font-semibold rounded-md text-slate-600 dark:text-slate-300">手动单条新增</button>
+      </div>
+
+      <!-- JSON Import Panel -->
+      <div id="panelJsonImport">
+        <div class="flex items-center justify-between mb-1.5">
+          <label for="jsonInput" class="text-xs font-semibold text-slate-600 dark:text-slate-300">粘贴新一期 JSON 数组</label>
+          <button id="copyTemplateBtn" type="button" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">复制 JSON 模板</button>
+        </div>
+        <textarea id="jsonInput" rows="7" placeholder="[{&quot;id&quot;:&quot;20261119-09-1&quot;,&quot;edition&quot;:&quot;2026-11-19 早报 (09:00)&quot;,&quot;date&quot;:&quot;2026-11-19&quot;,&quot;category&quot;:&quot;hot&quot;,&quot;lab&quot;:&quot;OpenAI&quot;,&quot;title&quot;:&quot;示例标题&quot;,&quot;funTake&quot;:&quot;一句话趣味点评&quot;,&quot;summary&quot;:&quot;详细新闻内容&quot;,&quot;sources&quot;:[{&quot;label&quot;:&quot;官网&quot;,&quot;url&quot;:&quot;https://openai.com&quot;}]}]" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-3 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        <div class="flex items-center justify-between mt-3">
+          <button id="resetDemoBtn" type="button" class="text-xs text-rose-600 dark:text-rose-400 hover:underline">重置为初始首发版</button>
+          <button id="confirmJsonImportBtn" type="button" class="px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition">合并导入并保留历史</button>
+        </div>
+      </div>
+
+      <!-- Manual Add Panel -->
+      <form id="panelManualAdd" class="hidden space-y-3">
+        <div>
+          <label for="manualTitle" class="block text-xs font-semibold mb-1">资讯标题 *</label>
+          <input id="manualTitle" type="text" required="" placeholder="例如：某开源模型今日发布" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="manualCategory" class="block text-xs font-semibold mb-1">所属栏目</label>
+            <select id="manualCategory" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm">
+              <option value="hot">🔥 今日爆点</option>
+              <option value="models">🧠 模型与硬件</option>
+              <option value="tools">🛠️ 开源与工具</option>
+              <option value="fun">🎭 趣闻与合规</option>
+              <option value="github">🐙 GitHub 每日开源Top5</option>
+              <option value="china">🇨🇳 中国 AI 动态</option>
+            </select>
+          </div>
+          <div>
+            <label for="manualLab" class="block text-xs font-semibold mb-1">厂商 / 机构</label>
+            <input id="manualLab" type="text" placeholder="如 Google / MIT" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm">
+          </div>
+        </div>
+        <div>
+          <label for="manualFunTake" class="block text-xs font-semibold mb-1">趣味锐评</label>
+          <input id="manualFunTake" type="text" placeholder="用一句有趣的话概括亮点" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label for="manualSummary" class="block text-xs font-semibold mb-1">核心事实 *</label>
+          <textarea id="manualSummary" rows="3" required="" placeholder="输入新闻摘要..." class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm"></textarea>
+        </div>
+        <div>
+          <label for="manualUrl" class="block text-xs font-semibold mb-1">原文链接（可选）</label>
+          <input id="manualUrl" type="url" placeholder="https://..." class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm">
+        </div>
+        <div class="flex justify-end pt-1">
+          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition">添加到看板</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- GitHub Auto-Update Kit Modal -->
+  <div id="githubKitModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-5 sm:p-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-bold">🤖 一键下载 GitHub 全自动更新脚本（免403直下）</h2>
+        <button id="closeGithubKitBtn" type="button" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">✕</button>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+        直接点击下方 4 个按钮，所有文件会直接从当前网页内存生成并保存到你的电脑（不会跳转外部链接，也不会出现 403 错误）：
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+        <button id="dlIndexHtmlBtn" type="button" class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 bg-slate-50 dark:bg-slate-800 text-left transition">
+          <div class="text-sm font-bold text-indigo-600 dark:text-indigo-400">① 下载 index.html</div>
+          <div class="text-xs text-slate-500 mt-0.5">支持云端自动同步的看板主页</div>
+        </button>
+        <button id="dlNewsJsonBtn" type="button" class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 bg-slate-50 dark:bg-slate-800 text-left transition">
+          <div class="text-sm font-bold text-indigo-600 dark:text-indigo-400">② 下载 news.json</div>
+          <div class="text-xs text-slate-500 mt-0.5">初始历史资讯数据表</div>
+        </button>
+        <button id="dlUpdatePyBtn" type="button" class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 bg-slate-50 dark:bg-slate-800 text-left transition">
+          <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400">③ 下载 update_news.py</div>
+          <div class="text-xs text-slate-500 mt-0.5">自动抓全网资讯+GitHub+AI锐评脚本</div>
+        </button>
+        <button id="dlWorkflowYmlBtn" type="button" class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 bg-slate-50 dark:bg-slate-800 text-left transition">
+          <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400">④ 下载 auto_update.yml</div>
+          <div class="text-xs text-slate-500 mt-0.5">每天 09:00 / 20:00 定时任务配置</div>
+        </button>
+      </div>
+      <div class="rounded-xl bg-slate-100 dark:bg-slate-800/80 p-3 text-xs text-slate-600 dark:text-slate-300 space-y-1">
+        <div class="font-bold">💡 提示：也可以直接点击按钮复制定时任务代码</div>
+        <button id="copyWorkflowYmlBtn" type="button" class="mt-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition">复制 auto_update.yml 代码</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs sm:text-sm font-medium shadow-lg transition-all hidden">已下载 index.html</div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'ai_daily_pulse_kanban_v3';
+
+      const CATEGORIES = [
+        { id: 'hot', title: '🔥 今日爆点', accent: 'border-t-rose-500', pill: 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300' },
+        { id: 'china', title: '🇨🇳 中国 AI 动态', accent: 'border-t-red-500', pill: 'bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300' },
+        { id: 'github', title: '🐙 GitHub 每日开源Top5', accent: 'border-t-violet-500', pill: 'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300' },
+        { id: 'models', title: '🧠 模型与硬件', accent: 'border-t-indigo-500', pill: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300' },
+        { id: 'tools', title: '🛠️ 开源与工具', accent: 'border-t-emerald-500', pill: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300' },
+        { id: 'fun', title: '🎭 趣闻与合规', accent: 'border-t-amber-500', pill: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300' },
+      ];
+
+      const STATUS_COLUMNS = [
+        { id: 'todo', title: '👀 待看 (To Read)', accent: 'border-t-slate-400' },
+        { id: 'reading', title: '☕ 精读中 (Reading)', accent: 'border-t-indigo-500' },
+        { id: 'archived', title: '⭐ 已收藏归档 (Archived)', accent: 'border-t-emerald-500' },
+      ];
+
+      const INITIAL_CARDS = [
+        {
+          id: '20261118-01',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-18',
+          category: 'hot',
+          lab: 'OpenAI',
+          funScore: 95,
+          title: 'GPT-6.2 Astra & Sol 登场，ChatGPT 语音也取消 10 分钟限制',
+          funTake: '以前 AI 写代码像实习生，现在 Astra 和 Sol 连财务月结报表都接管了，连语音吐槽都能无限时长不断线！',
+          summary: 'OpenAI 于 11 月 17 日在 ChatGPT Work 和 Codex 桌面端推出 GPT-6.2 Astra（1.1M 上下文，定价 $8/$40 per 1M tokens，Opper Intelligence 62）与 GPT-6.2 Sol（1.1M 上下文，定价 $2/$10，Intelligence 57）。11 月 18 日紧接着上线 Live Dictation 实时语音听写并取消 10 分钟录音上限，同时发布可对账、开票、准备月结报表的 Accounting 插件。',
+          sources: [
+            { label: 'ChatGPT Release Notes', url: 'https://help.openai.com/en/articles/6825453-chatgpt-release-notes' },
+            { label: 'Opper AI 模型追踪', url: 'https://opper.ai/model-releases' }
+          ],
+          status: 'todo',
+          starred: true,
+          note: ''
+        },
+        {
+          id: '20261118-02',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-16',
+          category: 'hot',
+          lab: 'Google DeepMind',
+          funScore: 97,
+          title: 'Gemini 4 Hydrogen 发布：把 Google Sheets 玩成全动态像素画布',
+          funTake: '谁能想到有一天电子表格能拿来放像素动画？Hydrogen 还用实时全球闪电数据做出了 3D 地球音乐盒！',
+          summary: 'Google 推出 Gemini 4 Hydrogen（1M 输入 / 高达 1M 输出，定价 $1.50/$7.50），默认 high 思考等级在 Artificial Analysis Intelligence Index 拿下 51 分（xhigh 达 54 分），比 Gemini 3.8 Flash 快 2.5 倍，Terminal-Bench 4.1 达 57%（对比 18.2%）。配合 Google Antigravity Orchestrator 自动调度模型，平均省 24% 配额、快 19%。',
+          sources: [
+            { label: 'Google 官方博客', url: 'https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-hydrogen/' }
+          ],
+          status: 'todo',
+          starred: true,
+          note: ''
+        },
+        {
+          id: '20261118-03',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-18',
+          category: 'models',
+          lab: 'NVIDIA / ASUS / Dell / MSI',
+          funScore: 91,
+          title: 'NVIDIA RTX Spark 迷你桌面主机开售：桌角本地跑 120B 模型',
+          funTake: '以前跑 1200 亿参数模型得租机房，现在直接塞进显示器旁的小主机——就是 $4,699 起步的售价也很“核弹”。',
+          summary: '11 月 18 日，NVIDIA 宣布华硕（ASUS ProArt GR1X）、戴尔与微星（MSI EdgeMesa N AI+）的 RTX Spark 紧凑型桌面 PC 正式开卖。搭载 20 核 Grace CPU + Blackwell RTX GPU（6,144 CUDA 核心）+ 最高 128GB 统一内存，号称支持本地 120B 参数模型与 90GB+ 3D 场景实时渲染。微星 64GB/1TB 版本标价 $4,699，128GB/4TB 标价 $7,999。',
+          sources: [
+            { label: 'NVIDIA 官方博客', url: 'https://blogs.nvidia.com/blog/rtx-spark-desktop-local-ai-available-now/' },
+            { label: 'Superpower Daily 报道', url: 'https://superpowerdaily.com/posts/nvidia-confirms-rtx-spark-desktop-sales-from-asus-dell-and-msi-for-local-ai' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-04',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-16',
+          category: 'models',
+          lab: 'Anthropic / Alibaba',
+          funScore: 88,
+          title: '11 月模型榜“神仙打架”：Claude Fable 5.2 与 Qwen4-Max 同台',
+          funTake: '一边是 65 分旗舰拼智商天花板，一边是 $1.50 级选手拼性价比，11 月才过半已经发了 18 个新模型。',
+          summary: 'Opper AI 追踪显示 2026 年 11 月已记录 18 次模型发布：11 月 9 日 Anthropic 发布 Claude Fable 5.2（1M 上下文，Intelligence 65，定价 $8/$40）；11 月 16 日阿里发布 Qwen4-Max（1M 上下文，Intelligence 43，定价 $1.50/$4.50）；此前 10 月下旬还有 Moonshot Kimi K3.1 Pro 与 DeepSeek V4.1 Flash。',
+          sources: [
+            { label: 'Opper AI Release Tracker', url: 'https://opper.ai/model-releases' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-05',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-17',
+          category: 'tools',
+          lab: '开源社区 / GitHub',
+          funScore: 93,
+          title: 'DeepSeek Harness 破 27.9 万星，100 行代码的 mini-SWE-agent 走红',
+          funTake: '谁说 Agent 框架一定要写几万行？100 行 Python 配一个 Bash 终端，照样让大厂工程师天天拿来干活。',
+          summary: 'DataCamp 11 月盘点显示，DeepSeek Harness 自 8 月发布以来已达约 27.9 万 GitHub Stars，主打执行轨迹与工具调用透明化；mini-SWE-agent 核心代码仅约 100 行 Python，给模型开放 Bash 即可完成工程任务（约 9.5K Stars）。同期二进制逆向分析工具 REA 在 GitHub 也保持高热。',
+          sources: [
+            { label: 'DataCamp 盘点', url: 'https://www.datacamp.com/blog/top-open-source-ai-agent-harnesses' },
+            { label: 'GitHub Trending 解析', url: 'https://www.youtube.com/watch?v=Jh-4GPnur9A' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-06',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-09',
+          category: 'tools',
+          lab: 'MIT CSAIL & NYU',
+          funScore: 94,
+          title: 'MIT 研发 FLEX：喊一句“别洒笔记本上”，机器人自己躲开手机',
+          funTake: '机器人终于学会“举一反三”了！不用把家里每个贵重物品都写进代码，它自己就能悟出电子产品都怕水。',
+          summary: 'MIT CSAIL 与 NYU 团队推出 FLEX 机器人学习平台。当人对端咖啡的机械臂说“Don\'t spill on the laptop!”时，系统在约 5 秒内通过 Add → Generalize → Mask 三步流程，借助 LLM 常识推理出“液体会损坏所有电子产品”，从而自动绕开旁边的手机，也能举一反三避开易燃物与易碎品。',
+          sources: [
+            { label: 'MIT News 原文', url: 'https://news.mit.edu/2026/ai-assisted-learning-platform-helps-robots-reason-beyond-literal-commands-1109' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-07',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-13',
+          category: 'fun',
+          lab: 'OpenAI',
+          funScore: 92,
+          title: 'ChatGPT Wallet 上线：AI 代理挑好毛衣后直接刷 Face ID 结账',
+          funTake: 'AI 从“帮我写周报”正式进化到“帮我花钱”。唯一需要防备的是，以后逛网店可能连下单键都不用自己点了。',
+          summary: 'OpenAI 面向美国 18 岁以上 ChatGPT Pro 用户的“dots（常驻智能体）”推出 ChatGPT Wallet。用户在代理挑好商品或订好酒店后，核对商家与金额并通过 Face ID / Touch ID 生物识别授权，Wallet 会生成替代支付凭证完成结账，向商家与代理隐藏真实卡号同时保留信用卡积分。',
+          sources: [
+            { label: 'ChatGPT Release Notes', url: 'https://help.openai.com/en/articles/6825453-chatgpt-release-notes' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-08',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-18',
+          category: 'fun',
+          lab: 'Microsoft / California',
+          funScore: 84,
+          title: '微软启动 AI 透明度倡议 & 加州推进 SB 813 强制安全标准',
+          funTake: 'AI 智能体在前面狂飙，企业合规和地方法规也在同步给它们装“安全带”和“红绿灯”。',
+          summary: '11 月 17 日，微软联合多家跨行业机构发起 AI Transparency Initiative，强化企业对 AI 模型与智能体的信任；11 月 18 日，加州州长办公室公布落实 SB 813 独立 AI 监管与强制安全标准的下一步计划。',
+          sources: [
+            { label: 'Microsoft 新闻稿', url: 'https://news.microsoft.com/source/2026/11/17/microsoft-and-organizations-across-industries-launch-ai-transparency-initiative-to-strengthen-enterprise-trust-in-ai-models-and-agents/' },
+            { label: '加州州长办公室公告', url: 'https://www.gov.ca.gov/2026/11/18/governor-newsoms-nation-leading-ai-safety-framework-is-getting-even-stronger-as-california-releases-next-steps-on-mandatory-safety-standards-and-oversight/' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-gh-01',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-18',
+          category: 'github',
+          lab: '⭐ 394.8k Stars',
+          metric: '394.8k Stars · 82.9k Forks',
+          funScore: 98,
+          title: 'openclaw/openclaw：跨平台真正替你动手干活的 AI 智能体',
+          funTake: '39.4 万星的开源界顶流，主打“不光动嘴聊天，而是直接在任何系统上帮你把活干了”。',
+          summary: '这是一个跨操作系统（Any OS）的开源全能 AI 智能体项目，能够直接接管并执行跨平台的实际电脑操作任务。凭借高达 394.8k 的 GitHub Stars 和 82.9k Forks，它已成为开源社区最受关注的自主执行 Agent 代表之一。',
+          sources: [
+            { label: 'GitHub 仓库', url: 'https://github.com/openclaw/openclaw' }
+          ],
+          status: 'todo',
+          starred: true,
+          note: ''
+        },
+        {
+          id: '20261118-gh-02',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-18',
+          category: 'github',
+          lab: '⭐ 196.8k Stars',
+          metric: '196.8k Stars · 14.9k Forks',
+          funScore: 95,
+          title: 'microsoft/markitdown：把一切办公文档转成大模型最爱的 Markdown',
+          funTake: '近 20 万星的刚需神器，喂给 AI 之前先用它洗一遍 PDF 和文档，效果立竿见影。',
+          summary: '微软开源的 Python 文件转换工具（附带 CLI 与 MCP 服务），专门用于把 PDF、Office 文档等各类复杂文件快速转换成结构清晰的 Markdown 文本，方便大语言模型直接读取与分析。',
+          sources: [
+            { label: 'GitHub 仓库', url: 'https://github.com/microsoft/markitdown' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-gh-03',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-18',
+          category: 'github',
+          lab: '⭐ 184.4k Stars',
+          metric: '184,492 Stars',
+          funScore: 96,
+          title: 'ollama/ollama：一条命令在本地免费跑起最新开源大模型',
+          funTake: '18.4 万星的本地 AI 装机必备，想自己白嫖跑模型基本绕不开它。',
+          summary: '用 Go 语言编写的轻量级本地大模型运行工具，支持一条命令在个人电脑上部署并运行 Qwen、DeepSeek、GLM、Kimi 等热门开源模型，兼顾隐私与零 API 费用。',
+          sources: [
+            { label: 'AI 开源趋势榜参考', url: 'https://github.com/duanyytop/agents-radar/issues/3936' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-gh-04',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-18',
+          category: 'github',
+          lab: '⭐ 149.9k Stars',
+          metric: '149.9k Stars · 25.2k Forks',
+          funScore: 90,
+          title: 'langchain-ai/langchain：大模型应用与 Agent 工程的万能乐高积木',
+          funTake: '14.9 万星的常青树底座，想把模型、知识库和工具链拼成完整应用就靠它。',
+          summary: '老牌且持续进化的开源智能体工程平台，提供标准化的模型抽象、RAG 文档检索、记忆管理与工具调用编排框架，适合快速搭建生产级 LLM 应用。',
+          sources: [
+            { label: 'GitHub 仓库', url: 'https://github.com/langchain-ai/langchain' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-gh-05',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-18',
+          category: 'github',
+          lab: '🔥 今日 +1,917 Stars',
+          metric: '今日飙升 +1,917 Stars',
+          funScore: 94,
+          title: 'obra/superpowers：把开发流程变成 AI 可直接执行的“超能力技能包”',
+          funTake: '今日狂涨近两千星的新晋黑马，让 AI 写代码不再东一榔头西一棒槌。',
+          summary: '2026 年 11 月 18 日 GitHub 趋势榜增速最快的智能体技能（Agentic Skills）框架之一，将软件开发方法论封装成可组合、可执行的 AI 技能工作流。',
+          sources: [
+            { label: '2026-11-18 趋势榜', url: 'https://github.com/duanyytop/agents-radar/issues/4347' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-cn-01',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-17',
+          category: 'china',
+          lab: 'WorkBuddy',
+          funScore: 91,
+          title: 'WorkBuddy 5.11.4 更新：定时任务与 Office/MCP 稳定性再升级',
+          funTake: '打工人专属 AI 办公搭子把定时任务、Markdown 分块预览和高积分确认都打磨得更稳了。',
+          summary: 'WorkBuddy 于 11 月 17 日更新官方日志（含 5.11.4 等版本）：重点优化自定义侧栏与批量任务管理、定时任务重启/休眠补执行、高积分工具（图片/视频生成）使用前确认机制，并修复云端定时任务列表、Claw 跨设备同步及 Office/WPS 窗口协作问题。',
+          sources: [
+            { label: 'WorkBuddy 官方更新日志', url: 'https://www.workbuddy.ai/docs/zh/workbuddy/Changelog' }
+          ],
+          status: 'todo',
+          starred: true,
+          note: ''
+        },
+        {
+          id: '20261118-cn-02',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-17',
+          category: 'china',
+          lab: '字节跳动 · 豆包',
+          funScore: 93,
+          title: '豆包更新至 15.8.0，Seedance 2.0 视频生成模型全面免费开放',
+          funTake: '不仅能写文案改代码，现在登录豆包还能直接免费玩 Seedance 2.0 做视频、让桌面端帮你操作电脑。',
+          summary: '豆包客户端持续更新（Android 版于 2026 年 11 月 17 日更新至 15.8.0），并已全面接入 Seedance 2.0 视频生成模型供登录用户免费使用；豆包电脑版同时支持自主拆解任务、操作本地与云电脑、执行定时任务及调用 Seedream 系列生成图文。',
+          sources: [
+            { label: '豆包官网', url: 'https://www.doubao.com/' },
+            { label: '豆包电脑版', url: 'https://www.doubao.com/download/desktop' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        },
+        {
+          id: '20261118-cn-03',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-13',
+          category: 'china',
+          lab: 'DeepSeek',
+          funScore: 94,
+          title: 'DeepSeek 发布 Full-Suite App API，V4.1-Flash-1017 同步全端上线',
+          funTake: '主打“许愿式编程一键成真”，还坚持闲时半价的峰谷定价，性价比党狂喜。',
+          summary: '2026 年 11 月 13 日 DeepSeek 更新日志显示发布 Full-Suite App API；此前 DeepSeek V4.1 Flash 已升级至开源权重版本 V4.1-Flash-1017（官方网页端、App 与 API 同步切换），并继续保留 DeepSeek V4 Pro API 调用与闲时半价政策。',
+          sources: [
+            { label: 'DeepSeek 官方更新日志', url: 'https://api-docs.deepseek.com/zh-cn/updates/' },
+            { label: 'V4.1-Flash-1017 发布公告', url: 'https://api-docs.deepseek.com/zh-cn/news/news261017' }
+          ],
+          status: 'todo',
+          starred: true,
+          note: ''
+        },
+        {
+          id: '20261118-cn-04',
+          edition: '2026-11-18 晚间首发版',
+          date: '2026-11-16',
+          category: 'china',
+          lab: '阿里 / 腾讯 / 月之暗面',
+          funScore: 89,
+          title: '国产大模型 11 月连发：Qwen4-Max 百万上下文仅 $1.50，腾讯 Hy4 登场',
+          funTake: '百万上下文直接打到白菜价，国产模型在长文本和价格战上依然卷得飞起。',
+          summary: 'Opper AI 追踪显示：11 月 16 日阿里发布 Qwen4-Max（1M 上下文，输入/输出定价 $1.50/$4.50），11 月 3 日腾讯推出 Tencent Hy4；此前 10 月下旬月之暗面发布 Kimi K3.1 Pro（328K 上下文），国产主力模型持续密集迭代。',
+          sources: [
+            { label: 'Opper AI 模型追踪', url: 'https://opper.ai/model-releases' }
+          ],
+          status: 'todo',
+          starred: false,
+          note: ''
+        }
+      ];
+
+      let state = {
+        mode: 'category', // 'category' | 'status'
+        selectedEdition: 'ALL',
+        selectedCategory: 'ALL',
+        starOnly: false,
+        search: '',
+        theme: 'light',
+        cards: []
+      };
+
+      let activeCardId = null;
+      let draggedCardId = null;
+      let chartInstance = null;
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed.cards) && parsed.cards.length > 0) {
+              state = { ...state, ...parsed };
+              return;
+            }
+          }
+        } catch (e) {}
+        state.cards = INITIAL_CARDS.map(c => ({ ...c }));
+        saveState();
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            mode: state.mode,
+            selectedEdition: state.selectedEdition,
+            theme: state.theme,
+            cards: state.cards
+          }));
+        } catch (e) {}
+      }
+
+      function showToast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.remove('hidden');
+        clearTimeout(showToast._timer);
+        showToast._timer = setTimeout(() => el.classList.add('hidden'), 2600);
+      }
+
+      function applyTheme() {
+        const html = document.documentElement;
+        const btn = document.getElementById('themeToggleBtn');
+        if (state.theme === 'dark') {
+          html.classList.add('dark');
+          btn.textContent = '☀️';
+        } else {
+          html.classList.remove('dark');
+          btn.textContent = '🌙';
+        }
+        if (chartInstance) renderChart();
+      }
+
+      function getFilteredCards() {
+        const q = state.search.trim().toLowerCase();
+        return state.cards.filter(card => {
+          if (state.selectedEdition !== 'ALL' && card.edition !== state.selectedEdition) return false;
+          if (state.selectedCategory !== 'ALL' && card.category !== state.selectedCategory) return false;
+          if (state.starOnly && !card.starred) return false;
+          if (!q) return true;
+          const hay = [card.title, card.summary, card.funTake, card.lab, card.edition, card.note].join(' ').toLowerCase();
+          return hay.includes(q);
+        });
+      }
+
+      function populateEditionSelect() {
+        const select = document.getElementById('editionSelect');
+        const editions = Array.from(new Set(state.cards.map(c => c.edition)));
+        const prev = state.selectedEdition;
+        select.innerHTML = '';
+
+        const allOpt = document.createElement('option');
+        allOpt.value = 'ALL';
+        allOpt.textContent = `📚 全部往期档案 (${state.cards.length} 条)`;
+        select.appendChild(allOpt);
+
+        editions.forEach(ed => {
+          const count = state.cards.filter(c => c.edition === ed).length;
+          const opt = document.createElement('option');
+          opt.value = ed;
+          opt.textContent = `${ed} (${count})`;
+          select.appendChild(opt);
+        });
+
+        select.value = editions.includes(prev) || prev === 'ALL' ? prev : 'ALL';
+        state.selectedEdition = select.value;
+      }
+
+      function getCategoryMeta(catId) {
+        return CATEGORIES.find(c => c.id === catId) || CATEGORIES[0];
+      }
+
+      function getStatusLabel(status) {
+        if (status === 'reading') return '☕ 精读中';
+        if (status === 'archived') return '⭐ 已归档';
+        return '👀 待看';
+      }
+
+      function renderCategoryPills() {
+        const bar = document.getElementById('categoryPills');
+        if (!bar) return;
+        bar.innerHTML = '';
+        const baseCards = state.cards.filter(c => state.selectedEdition === 'ALL' || c.edition === state.selectedEdition);
+
+        const makePill = (id, label, count) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          const active = state.selectedCategory === id;
+          btn.className = active
+            ? 'px-3 py-1.5 text-xs font-semibold rounded-full bg-indigo-600 text-white shadow-sm transition'
+            : 'px-3 py-1.5 text-xs font-medium rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition';
+          btn.textContent = `${label} (${count})`;
+          btn.addEventListener('click', () => {
+            state.selectedCategory = id;
+            renderBoard();
+          });
+          return btn;
+        };
+
+        bar.appendChild(makePill('ALL', '全部栏目', baseCards.length));
+        CATEGORIES.forEach(cat => {
+          const cnt = baseCards.filter(c => c.category === cat.id).length;
+          bar.appendChild(makePill(cat.id, cat.title, cnt));
+        });
+      }
+
+      function renderBoard() {
+        renderCategoryPills();
+        const board = document.getElementById('kanbanBoard');
+        const filtered = getFilteredCards();
+
+        // Update stats
+        const starredCount = state.cards.filter(c => c.starred).length;
+        const archivedCount = state.cards.filter(c => c.status === 'archived').length;
+        document.getElementById('statsSummary').innerHTML =
+          `<span>共 <strong>${state.cards.length}</strong> 条留存</span><span>·</span><span>收藏 <strong>${starredCount}</strong></span><span>·</span><span>已归档 <strong>${archivedCount}</strong></span>`;
+
+        // Update mode buttons
+        const catBtn = document.getElementById('modeCategoryBtn');
+        const statusBtn = document.getElementById('modeStatusBtn');
+        const starBtn = document.getElementById('starFilterBtn');
+
+        if (state.mode === 'category') {
+          catBtn.className = 'px-3 py-1 text-xs font-semibold rounded-md transition bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm';
+          statusBtn.className = 'px-3 py-1 text-xs font-semibold rounded-md transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white';
+          board.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start';
+        } else {
+          statusBtn.className = 'px-3 py-1 text-xs font-semibold rounded-md transition bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm';
+          catBtn.className = 'px-3 py-1 text-xs font-semibold rounded-md transition text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white';
+          board.className = 'grid grid-cols-1 md:grid-cols-3 gap-4 items-start';
+        }
+
+        starBtn.className = state.starOnly
+          ? 'px-3 py-1.5 text-xs font-semibold rounded-lg border border-amber-400 bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-700 transition flex items-center gap-1'
+          : 'px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition flex items-center gap-1';
+
+        const columns = state.mode === 'category' ? (state.selectedCategory === 'ALL' ? CATEGORIES : CATEGORIES.filter(c => c.id === state.selectedCategory)) : STATUS_COLUMNS;
+        board.innerHTML = '';
+
+        columns.forEach(col => {
+          const colCards = filtered.filter(c => state.mode === 'category' ? c.category === col.id : c.status === col.id);
+          const colEl = document.createElement('section');
+          colEl.className = `rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 border-t-4 ${col.accent} p-3 flex flex-col gap-3 min-h-[260px]`;
+          colEl.dataset.colId = col.id;
+
+          if (state.mode === 'status') {
+            colEl.addEventListener('dragover', e => {
+              e.preventDefault();
+              colEl.classList.add('drop-active');
+            });
+            colEl.addEventListener('dragleave', () => colEl.classList.remove('drop-active'));
+            colEl.addEventListener('drop', e => {
+              e.preventDefault();
+              colEl.classList.remove('drop-active');
+              if (!draggedCardId) return;
+              const target = state.cards.find(c => c.id === draggedCardId);
+              if (target && target.status !== col.id) {
+                target.status = col.id;
+                saveState();
+                renderBoard();
+                showToast(`已移动到「${col.title}」`);
+              }
+            });
+          }
+
+          const header = document.createElement('div');
+          header.className = 'flex items-center justify-between px-1';
+          header.innerHTML = `
+            <h3 class="text-sm font-bold tracking-tight">${col.title}</h3>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700">${colCards.length}</span>
+          `;
+          colEl.appendChild(header);
+
+          if (colCards.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center text-xs text-slate-400';
+            empty.textContent = state.mode === 'status' ? '拖拽卡片到这里，或点击卡片内按钮切换状态' : '当前筛选条件下暂无资讯';
+            colEl.appendChild(empty);
+          } else {
+            colCards.forEach(card => {
+              const catMeta = getCategoryMeta(card.category);
+              const cardEl = document.createElement('article');
+              cardEl.className = 'card-hover cursor-pointer rounded-xl bg-white dark:bg-slate-800/95 border border-slate-200/90 dark:border-slate-700/80 p-3.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col gap-2.5';
+              if (state.mode === 'status') {
+                cardEl.draggable = true;
+                cardEl.addEventListener('dragstart', () => {
+                  draggedCardId = card.id;
+                  cardEl.classList.add('dragging');
+                });
+                cardEl.addEventListener('dragend', () => {
+                  draggedCardId = null;
+                  cardEl.classList.remove('dragging');
+                });
+              }
+
+              const topRow = document.createElement('div');
+              topRow.className = 'flex items-center justify-between gap-2';
+              topRow.innerHTML = `
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md ${catMeta.pill}">${escapeHtml(card.lab)}</span>
+                  <span class="text-[11px] text-slate-400">${escapeHtml(card.date)}</span>
+                </div>
+                <button type="button" class="star-btn text-sm leading-none p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700" title="收藏">${card.starred ? '⭐' : '☆'}</button>
+              `;
+              topRow.querySelector('.star-btn').addEventListener('click', e => {
+                e.stopPropagation();
+                card.starred = !card.starred;
+                saveState();
+                renderBoard();
+              });
+
+              const titleEl = document.createElement('h4');
+              titleEl.className = 'text-sm font-bold leading-snug text-slate-900 dark:text-slate-100';
+              titleEl.textContent = card.title;
+
+              const funEl = document.createElement('div');
+              funEl.className = 'text-xs bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 rounded-lg px-2.5 py-2 leading-relaxed';
+              funEl.innerHTML = `<span class="font-semibold">🌶️ 锐评：</span>${escapeHtml(card.funTake)}`;
+
+              const footer = document.createElement('div');
+              footer.className = 'flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-700/70 text-[11px] text-slate-500 dark:text-slate-400';
+
+              const statusPill = document.createElement('button');
+              statusPill.type = 'button';
+              statusPill.className = 'px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-slate-700 dark:text-slate-200 font-medium transition';
+              statusPill.textContent = getStatusLabel(card.status);
+              statusPill.title = '点击切换阅读进度';
+              statusPill.addEventListener('click', e => {
+                e.stopPropagation();
+                const order = ['todo', 'reading', 'archived'];
+                card.status = order[(order.indexOf(card.status) + 1) % order.length];
+                saveState();
+                renderBoard();
+              });
+
+              const rightMeta = document.createElement('div');
+              rightMeta.className = 'flex items-center gap-2';
+              rightMeta.innerHTML = `
+                ${card.note ? '<span title="已有笔记">📝</span>' : ''}
+                <span>趣味 ${card.funScore || 90}</span>
+              `;
+
+              footer.appendChild(statusPill);
+              footer.appendChild(rightMeta);
+
+              cardEl.appendChild(topRow);
+              cardEl.appendChild(titleEl);
+              cardEl.appendChild(funEl);
+              cardEl.appendChild(footer);
+              cardEl.addEventListener('click', () => openDetailModal(card.id));
+
+              colEl.appendChild(cardEl);
+            });
+          }
+
+          board.appendChild(colEl);
+        });
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function openDetailModal(cardId) {
+        const card = state.cards.find(c => c.id === cardId);
+        if (!card) return;
+        activeCardId = cardId;
+        const catMeta = getCategoryMeta(card.category);
+
+        document.getElementById('modalBadges').innerHTML = `
+          <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full ${catMeta.pill}">${catMeta.title}</span>
+          <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">${escapeHtml(card.lab)}</span>
+          <span class="text-xs text-slate-400">${escapeHtml(card.edition)} · ${escapeHtml(card.date)}</span>
+        `;
+        document.getElementById('modalTitle').textContent = card.title;
+        document.getElementById('modalFunTake').textContent = card.funTake;
+        document.getElementById('modalSummary').textContent = card.summary;
+
+        const srcContainer = document.getElementById('modalSources');
+        srcContainer.innerHTML = '';
+        (card.sources || []).forEach(s => {
+          const a = document.createElement('a');
+          a.href = s.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = 'inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition';
+          a.textContent = `🔗 ${s.label}`;
+          srcContainer.appendChild(a);
+        });
+
+        const starBtn = document.getElementById('modalStarBtn');
+        starBtn.textContent = card.starred ? '⭐ 已收藏（点击取消）' : '☆ 收藏这条资讯';
+
+        const statusContainer = document.getElementById('modalStatusBtns');
+        statusContainer.innerHTML = '';
+        STATUS_COLUMNS.forEach(st => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          const active = card.status === st.id;
+          btn.className = active
+            ? 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white'
+            : 'px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800';
+          btn.textContent = st.title;
+          btn.addEventListener('click', () => {
+            card.status = st.id;
+            saveState();
+            renderBoard();
+            openDetailModal(cardId);
+          });
+          statusContainer.appendChild(btn);
+        });
+
+        document.getElementById('modalNoteInput').value = card.note || '';
+        document.getElementById('detailModal').classList.remove('hidden');
+      }
+
+      function renderChart() {
+        const ctx = document.getElementById('modelChart');
+        if (!ctx || typeof Chart === 'undefined') return;
+        if (chartInstance) chartInstance.destroy();
+
+        const isDark = state.theme === 'dark';
+        const textColor = isDark ? '#cbd5e1' : '#334155';
+        const gridColor = isDark ? 'rgba(148,163,184,0.15)' : 'rgba(148,163,184,0.25)';
+
+        chartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Claude Fable 5.2', 'GPT-6.2 Astra', 'GPT-6.2 Sol', 'Gemini 4 Hydrogen', 'Qwen4-Max'],
+            datasets: [
+              {
+                label: 'Intelligence 评分 (Opper AI)',
+                data: [65, 62, 57, 54, 43],
+                backgroundColor: 'rgba(99, 102, 241, 0.85)',
+                borderRadius: 6,
+                yAxisID: 'y'
+              },
+              {
+                label: '输入价格 ($ / 1M tokens)',
+                data: [8.0, 8.0, 2.0, 1.5, 1.5],
+                backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                borderRadius: 6,
+                yAxisID: 'y1'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: textColor, font: { size: 12 } } }
+            },
+            scales: {
+              x: { ticks: { color: textColor }, grid: { display: false } },
+              y: {
+                position: 'left',
+                min: 0,
+                max: 80,
+                ticks: { color: textColor },
+                grid: { color: gridColor },
+                title: { display: true, text: 'Intelligence', color: textColor }
+              },
+              y1: {
+                position: 'right',
+                min: 0,
+                max: 12,
+                ticks: { color: textColor },
+                grid: { drawOnChartArea: false },
+                title: { display: true, text: 'USD / 1M Input', color: textColor }
+              }
+            }
+          }
+        });
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => showToast('已复制 JSON 模板')).catch(() => fallbackCopy(text));
+        } else {
+          fallbackCopy(text);
+        }
+      }
+
+      function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast('已复制 JSON 模板');
+        } catch (e) {
+          showToast('请手动全选复制');
+        }
+        document.body.removeChild(ta);
+      }
+
+      // Event Listeners
+      document.getElementById('modeCategoryBtn').addEventListener('click', () => {
+        state.mode = 'category';
+        saveState();
+        renderBoard();
+      });
+
+      document.getElementById('modeStatusBtn').addEventListener('click', () => {
+        state.mode = 'status';
+        saveState();
+        renderBoard();
+      });
+
+      document.getElementById('editionSelect').addEventListener('change', e => {
+        state.selectedEdition = e.target.value;
+        saveState();
+        renderBoard();
+      });
+
+      document.getElementById('starFilterBtn').addEventListener('click', () => {
+        state.starOnly = !state.starOnly;
+        renderBoard();
+      });
+
+      document.getElementById('searchInput').addEventListener('input', e => {
+        state.search = e.target.value;
+        renderBoard();
+      });
+
+      document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        state.theme = state.theme === 'dark' ? 'light' : 'dark';
+        saveState();
+        applyTheme();
+      });
+
+      document.getElementById('toggleChartBtn').addEventListener('click', () => {
+        const panel = document.getElementById('chartPanel');
+        panel.classList.toggle('hidden');
+        if (!panel.classList.contains('hidden')) renderChart();
+      });
+
+      document.getElementById('closeChartBtn').addEventListener('click', () => {
+        document.getElementById('chartPanel').classList.add('hidden');
+      });
+
+      document.getElementById('closeDetailBtn').addEventListener('click', () => {
+        document.getElementById('detailModal').classList.add('hidden');
+      });
+
+      document.getElementById('detailModal').addEventListener('click', e => {
+        if (e.target.id === 'detailModal') document.getElementById('detailModal').classList.add('hidden');
+      });
+
+      document.getElementById('modalStarBtn').addEventListener('click', () => {
+        const card = state.cards.find(c => c.id === activeCardId);
+        if (!card) return;
+        card.starred = !card.starred;
+        saveState();
+        renderBoard();
+        openDetailModal(activeCardId);
+      });
+
+      document.getElementById('saveNoteBtn').addEventListener('click', () => {
+        const card = state.cards.find(c => c.id === activeCardId);
+        if (!card) return;
+        card.note = document.getElementById('modalNoteInput').value.trim();
+        saveState();
+        renderBoard();
+        showToast('笔记已保存到本地档案');
+      });
+
+      document.getElementById('exportBtn').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(state.cards, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ai-daily-pulse-archive-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('已导出全部历史资讯与笔记');
+      });
+
+      // Import Modal Logic
+      document.getElementById('openImportBtn').addEventListener('click', () => {
+        document.getElementById('importModal').classList.remove('hidden');
+      });
+
+      document.getElementById('closeImportBtn').addEventListener('click', () => {
+        document.getElementById('importModal').classList.add('hidden');
+      });
+
+      document.getElementById('importModal').addEventListener('click', e => {
+        if (e.target.id === 'importModal') document.getElementById('importModal').classList.add('hidden');
+      });
+
+      document.getElementById('tabJsonImport').addEventListener('click', () => {
+        document.getElementById('panelJsonImport').classList.remove('hidden');
+        document.getElementById('panelManualAdd').classList.add('hidden');
+        document.getElementById('tabJsonImport').className = 'px-3 py-1 text-xs font-semibold rounded-md bg-white dark:bg-slate-700 shadow-sm';
+        document.getElementById('tabManualAdd').className = 'px-3 py-1 text-xs font-semibold rounded-md text-slate-600 dark:text-slate-300';
+      });
+
+      document.getElementById('tabManualAdd').addEventListener('click', () => {
+        document.getElementById('panelManualAdd').classList.remove('hidden');
+        document.getElementById('panelJsonImport').classList.add('hidden');
+        document.getElementById('tabManualAdd').className = 'px-3 py-1 text-xs font-semibold rounded-md bg-white dark:bg-slate-700 shadow-sm';
+        document.getElementById('tabJsonImport').className = 'px-3 py-1 text-xs font-semibold rounded-md text-slate-600 dark:text-slate-300';
+      });
+
+      document.getElementById('copyTemplateBtn').addEventListener('click', () => {
+        const tpl = JSON.stringify([
+          {
+            id: '20261119-09-01',
+            edition: '2026-11-19 早报 (09:00)',
+            date: '2026-11-19',
+            category: 'hot',
+            lab: '机构名称',
+            funScore: 90,
+            title: '新资讯标题',
+            funTake: '一句话趣味点评',
+            summary: '核心事实摘要',
+            sources: [{ label: '官方来源', url: 'https://example.com' }]
+          }
+        ], null, 2);
+        copyText(tpl);
+      });
+
+      document.getElementById('confirmJsonImportBtn').addEventListener('click', () => {
+        const raw = document.getElementById('jsonInput').value.trim();
+        if (!raw) {
+          showToast('请先粘贴 JSON 数据');
+          return;
+        }
+        try {
+          const parsed = JSON.parse(raw);
+          const list = Array.isArray(parsed) ? parsed : [parsed];
+          const existingIds = new Set(state.cards.map(c => c.id));
+          const existingTitles = new Set(state.cards.map(c => c.title));
+          let added = 0;
+          list.forEach((item, idx) => {
+            if (!item || !item.title || !item.summary) return;
+            const id = item.id || `import-${Date.now()}-${idx}`;
+            if (existingIds.has(id) || existingTitles.has(item.title)) return;
+            state.cards.unshift({
+              id,
+              edition: item.edition || `${new Date().toISOString().slice(0, 10)} 增量更新`,
+              date: item.date || new Date().toISOString().slice(0, 10),
+              category: ['hot', 'models', 'tools', 'fun', 'github', 'china'].includes(item.category) ? item.category : 'hot',
+              lab: item.lab || 'AI 前沿',
+              funScore: Number(item.funScore) || 90,
+              title: item.title,
+              funTake: item.funTake || '新鲜出炉的 AI 资讯！',
+              summary: item.summary,
+              sources: Array.isArray(item.sources) ? item.sources : [],
+              status: 'todo',
+              starred: Boolean(item.starred),
+              note: item.note || ''
+            });
+            added++;
+          });
+          saveState();
+          populateEditionSelect();
+          renderBoard();
+          document.getElementById('jsonInput').value = '';
+          document.getElementById('importModal').classList.add('hidden');
+          showToast(added > 0 ? `成功新增 ${added} 条资讯，历史已保留` : '未发现新增条目（已自动去重）');
+        } catch (err) {
+          showToast('JSON 格式有误，请检查括号与引号');
+        }
+      });
+
+      document.getElementById('resetDemoBtn').addEventListener('click', () => {
+        state.cards = INITIAL_CARDS.map(c => ({ ...c }));
+        state.selectedEdition = 'ALL';
+        saveState();
+        populateEditionSelect();
+        renderBoard();
+        document.getElementById('importModal').classList.add('hidden');
+        showToast('已重置为 2026-11-18 首发版数据');
+      });
+
+      document.getElementById('panelManualAdd').addEventListener('submit', e => {
+        e.preventDefault();
+        const title = document.getElementById('manualTitle').value.trim();
+        const summary = document.getElementById('manualSummary').value.trim();
+        if (!title || !summary) return;
+        const url = document.getElementById('manualUrl').value.trim();
+        const today = new Date().toISOString().slice(0, 10);
+        state.cards.unshift({
+          id: `manual-${Date.now()}`,
+          edition: `${today} 手动收录`,
+          date: today,
+          category: document.getElementById('manualCategory').value,
+          lab: document.getElementById('manualLab').value.trim() || '自定义收录',
+          funScore: 90,
+          title,
+          funTake: document.getElementById('manualFunTake').value.trim() || '个人收藏的高价值 AI 动态。',
+          summary,
+          sources: url ? [{ label: '查看原文', url }] : [],
+          status: 'todo',
+          starred: false,
+          note: ''
+        });
+        saveState();
+        populateEditionSelect();
+        renderBoard();
+        e.target.reset();
+        document.getElementById('importModal').classList.add('hidden');
+        showToast('已添加新资讯到看板');
+      });
+
+      async function syncRemoteJson() {
+        try {
+          const res = await fetch('./news.json?t=' + Date.now(), { cache: 'no-store' });
+          if (!res.ok) return;
+          const remoteCards = await res.json();
+          if (!Array.isArray(remoteCards)) return;
+          const existingIds = new Set(state.cards.map(c => c.id));
+          const existingTitles = new Set(state.cards.map(c => c.title));
+          let added = 0;
+          remoteCards.forEach(item => {
+            if (!item || !item.title) return;
+            if (existingIds.has(item.id) || existingTitles.has(item.title)) return;
+            state.cards.unshift({
+              ...item,
+              status: item.status || 'todo',
+              starred: Boolean(item.starred),
+              note: item.note || ''
+            });
+            added++;
+          });
+          if (added > 0) {
+            saveState();
+            populateEditionSelect();
+            renderBoard();
+            showToast(`已从云端自动同步 ${added} 条最新资讯`);
+          }
+        } catch (e) {
+          // Offline or no remote news.json yet; silently use local state
+        }
+      }
+
+      const EMBEDDED_UPDATE_PY = "#!/usr/bin/env python3\n\"\"\"\n\u6bcf\u65e5 09:00 / 20:00 \u81ea\u52a8\u6293\u53d6\u5168\u7f51 AI \u8d44\u8baf\u3001\u4e2d\u56fd AI \u52a8\u6001\u4e0e GitHub \u70ed\u95e8\u5f00\u6e90\u9879\u76ee\uff0c\n\u8c03\u7528 Gemini API (\u6216\u517c\u5bb9 OpenAI \u683c\u5f0f\u7684 DeepSeek API) \u751f\u6210\u8da3\u5473\u9510\u8bc4\u5e76\u589e\u91cf\u5199\u5165 news.json\u3002\n\u4ec5\u4f7f\u7528 Python \u6807\u51c6\u5e93\uff0c\u96f6\u5916\u90e8\u4f9d\u8d56\uff0c\u5728 GitHub Actions \u4e2d\u79d2\u7ea7\u8fd0\u884c\u3002\n\"\"\"\nimport datetime\nimport json\nimport os\nimport urllib.parse\nimport urllib.request\nimport xml.etree.ElementTree as ET\n\nNEWS_JSON_PATH = \"news.json\"\n\nRSS_FEEDS = [\n    (\"Global AI\", \"https://blog.google/innovation-and-ai/technology/ai/rss/\"),\n    (\"MIT AI News\", \"https://news.mit.edu/rss/topic/artificial-intelligence2\"),\n    (\"IT\u4e4b\u5bb6 AI\", \"https://www.ithome.com/rss/\"),\n]\n\n\ndef http_get_text(url, headers=None, timeout=15):\n    req_headers = {\"User-Agent\": \"AI-Daily-Pulse-Kanban/1.0\"}\n    if headers:\n        req_headers.update(headers)\n    req = urllib.request.Request(url, headers=req_headers)\n    with urllib.request.urlopen(req, timeout=timeout) as resp:\n        return resp.read().decode(\"utf-8\", errors=\"ignore\")\n\n\ndef fetch_github_top5():\n    \"\"\"\u6293\u53d6\u8fd1\u671f\u9ad8\u70ed\u5ea6 AI \u5f00\u6e90\u9879\u76ee\uff08\u9644\u771f\u5b9e Star \u6536\u85cf\u6570\u4e0e\u7b80\u4ecb\uff09\"\"\"\n    since_date = (datetime.date.today() - datetime.timedelta(days=14)).isoformat()\n    q = urllib.parse.quote(f\"topic:ai pushed:>={since_date}\")\n    url = f\"https://api.github.com/search/repositories?q={q}&sort=stars&order=desc&per_page=10\"\n    try:\n        raw = http_get_text(url, {\"Accept\": \"application/vnd.github+json\"})\n        items = json.loads(raw).get(\"items\", [])[:8]\n        results = []\n        for it in items:\n            results.append({\n                \"name\": it.get(\"full_name\"),\n                \"stars\": it.get(\"stargazers_count\", 0),\n                \"forks\": it.get(\"forks_count\", 0),\n                \"description\": it.get(\"description\") or \"AI open-source project\",\n                \"url\": it.get(\"html_url\"),\n            })\n        return results\n    except Exception as e:\n        print(\"GitHub fetch warning:\", e)\n        return []\n\n\ndef fetch_rss_headlines():\n    \"\"\"\u6293\u53d6 RSS \u6700\u65b0\u6807\u9898\u4e0e\u94fe\u63a5\"\"\"\n    headlines = []\n    for source_name, feed_url in RSS_FEEDS:\n        try:\n            xml_text = http_get_text(feed_url)\n            root = ET.fromstring(xml_text)\n            for item in root.findall(\".//item\")[:6]:\n                title = (item.findtext(\"title\") or \"\").strip()\n                link = (item.findtext(\"link\") or \"\").strip()\n                desc = (item.findtext(\"description\") or \"\").strip()[:280]\n                if title and link:\n                    headlines.append({\n                        \"source\": source_name,\n                        \"title\": title,\n                        \"url\": link,\n                        \"snippet\": desc,\n                    })\n        except Exception as e:\n            print(f\"RSS fetch warning ({source_name}):\", e)\n    return headlines\n\n\ndef call_gemini_api(api_key, prompt):\n    url = f\"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}\"\n    payload = {\n        \"contents\": [{\"parts\": [{\"text\": prompt}]}],\n        \"generationConfig\": {\"responseMimeType\": \"application/json\", \"temperature\": 0.7},\n    }\n    req = urllib.request.Request(\n        url,\n        data=json.dumps(payload).encode(\"utf-8\"),\n        headers={\"Content-Type\": \"application/json\"},\n        method=\"POST\",\n    )\n    with urllib.request.urlopen(req, timeout=45) as resp:\n        data = json.loads(resp.read().decode(\"utf-8\"))\n        text = data[\"candidates\"][0][\"content\"][\"parts\"][0][\"text\"]\n        return json.loads(text)\n\n\ndef main():\n    now_bj = datetime.datetime.utcnow() + datetime.timedelta(hours=8)\n    date_str = now_bj.strftime(\"%Y-%m-%d\")\n    slot = \"\u65e9\u62a5 (09:00)\" if now_bj.hour < 15 else \"\u665a\u62a5 (20:00)\"\n    edition_name = f\"{date_str} {slot}\"\n\n    existing = []\n    if os.path.exists(NEWS_JSON_PATH):\n        try:\n            existing = json.load(open(NEWS_JSON_PATH, \"r\", encoding=\"utf-8\"))\n        except Exception:\n            existing = []\n\n    existing_titles = {c.get(\"title\") for c in existing}\n    gh_repos = fetch_github_top5()\n    rss_items = fetch_rss_headlines()\n\n    api_key = os.environ.get(\"GEMINI_API_KEY\", \"\").strip()\n    new_cards = []\n\n    if api_key and (gh_repos or rss_items):\n        prompt = f\"\"\"\u4f60\u662f\u300cAI \u6bcf\u65e5\u8da3\u5473\u8d44\u8baf\u770b\u677f\u300d\u4e3b\u7f16\u3002\u8bf7\u6839\u636e\u4ee5\u4e0b\u4eca\u65e5\u6293\u53d6\u7684\u771f\u5b9e\u5f00\u6e90\u9879\u76ee\u548c\u79d1\u6280\u8d44\u8baf\uff0c\u52a0\u4e0a\u91cd\u70b9\u5173\u6ce8\u4e2d\u56fd AI \u52a8\u6001\uff08\u5982 DeepSeek\u3001\u8c46\u5305\u3001WorkBuddy\u3001Qwen\u3001Kimi\uff09\uff0c\u751f\u6210 JSON \u6570\u7ec4\u3002\n\u5f53\u524d\u671f\u6570 edition \u56fa\u5b9a\u4e3a\uff1a\"{edition_name}\"\uff0c\u65e5\u671f date \u56fa\u5b9a\u4e3a\uff1a\"{date_str}\"\u3002\n\u8bf7\u8f93\u51fa 8~10 \u6761\u4e0d\u4e0e\u5df2\u6709\u6807\u9898\u91cd\u590d\u7684\u5361\u7247\uff0c\u5176\u4e2d\u5fc5\u987b\u5305\u542b 5 \u6761 category \u4e3a \"github\" \u7684 GitHub \u5f00\u6e90\u9879\u76ee\u63a8\u8350\uff08\u5fc5\u987b\u89e3\u91ca\u9879\u76ee\u662f\u4ec0\u4e48\u3001\u89e3\u51b3\u4ec0\u4e48\u95ee\u9898\uff0c\u5e76\u5728 lab \u5b57\u6bb5\u6807\u6ce8\u771f\u5b9e Star \u6536\u85cf\u6570\uff09\uff0c\u4ee5\u53ca\u5168\u7403 AI \u8d44\u8baf\uff08category \u4e3a \"hot\"\u3001\"models\"\u3001\"tools\"\u3001\"fun\"\uff09\u548c\u4e2d\u56fd AI \u52a8\u6001\uff08category \u4e3a \"china\"\uff09\u3002\n\u6bcf\u6761 JSON \u683c\u5f0f\u4e25\u683c\u5982\u4e0b\uff1a\n{{\n  \"id\": \"\u552f\u4e00\u5b57\u7b26\u4e32ID\",\n  \"edition\": \"{edition_name}\",\n  \"date\": \"{date_str}\",\n  \"category\": \"hot|china|github|models|tools|fun\",\n  \"lab\": \"\u5382\u5546\u6216\u2b50 Star\u6570\",\n  \"funScore\": 92,\n  \"title\": \"\u5438\u5f15\u4eba\u7684\u4e2d\u6587\u6807\u9898\",\n  \"funTake\": \"\u4e00\u53e5\u5e7d\u9ed8\u63a5\u5730\u6c14\u7684\u8da3\u5473\u9510\u8bc4\",\n  \"summary\": \"\u8be6\u7ec6\u6e05\u6670\u7684\u4e8b\u5b9e\u8bf4\u660e\uff08GitHub\u9879\u76ee\u5fc5\u987b\u89e3\u91ca\u5177\u4f53\u7528\u9014\u4e0e\u63a8\u8350\u7406\u7531\uff09\",\n  \"sources\": [{{\"label\": \"\u539f\u6587\u94fe\u63a5\", \"url\": \"\u771f\u5b9eURL\"}}]\n}}\n\u4eca\u65e5 GitHub \u5019\u9009\u6570\u636e\uff1a{json.dumps(gh_repos, ensure_ascii=False)}\n\u4eca\u65e5\u8d44\u8baf\u5019\u9009\u6570\u636e\uff1a{json.dumps(rss_items[:12], ensure_ascii=False)}\n\u5df2\u6709\u6807\u9898\uff08\u8bf7\u52ff\u91cd\u590d\uff09\uff1a{json.dumps(list(existing_titles)[:30], ensure_ascii=False)}\n\u53ea\u8f93\u51fa JSON \u6570\u7ec4\uff1a\"\"\"\n        try:\n            generated = call_gemini_api(api_key, prompt)\n            if isinstance(generated, list):\n                new_cards = generated\n        except Exception as e:\n            print(\"Gemini API call failed, falling back to direct formatting:\", e)\n\n    if not new_cards:\n        for idx, repo in enumerate(gh_repos[:5]):\n            new_cards.append({\n                \"id\": f\"{date_str}-gh-{idx+1}\",\n                \"edition\": edition_name,\n                \"date\": date_str,\n                \"category\": \"github\",\n                \"lab\": f\"\u2b50 {repo['stars']:,} Stars\",\n                \"funScore\": 92,\n                \"title\": f\"{repo['name']}\uff1a\u9ad8\u70ed\u5ea6 AI \u5f00\u6e90\u9879\u76ee\",\n                \"funTake\": f\"\u6536\u83b7 {repo['stars']:,} Stars \u4e0e {repo['forks']:,} Forks \u7684\u70ed\u95e8\u5f00\u6e90\u4ed3\u5e93\u3002\",\n                \"summary\": f\"\u9879\u76ee\u7b80\u4ecb\uff1a{repo['description']}\uff08GitHub \u6536\u85cf\u6570\uff1a{repo['stars']:,} Stars\uff09\u3002\",\n                \"sources\": [{\"label\": \"GitHub \u4ed3\u5e93\", \"url\": repo[\"url\"]}],\n            })\n\n    added = 0\n    for card in reversed(new_cards):\n        if not isinstance(card, dict) or not card.get(\"title\"):\n            continue\n        if card[\"title\"] in existing_titles:\n            continue\n        existing.insert(0, card)\n        existing_titles.add(card[\"title\"])\n        added += 1\n\n    with open(NEWS_JSON_PATH, \"w\", encoding=\"utf-8\") as f:\n        json.dump(existing, f, ensure_ascii=False, indent=2)\n    print(f\"Done. Added {added} new cards to {NEWS_JSON_PATH}.\")\n\n\nif __name__ == \"__main__\":\n    main()\n";
+      const EMBEDDED_WORKFLOW_YML = "name: Daily AI News Kanban Update\n\non:\n  schedule:\n    # \u6bcf\u5929\u5317\u4eac\u65f6\u95f4 09:00 (UTC 01:00) \u548c 20:00 (UTC 12:00) \u81ea\u52a8\u8fd0\u884c\n    - cron: '0 1,12 * * *'\n  workflow_dispatch: # \u652f\u6301\u5728 GitHub \u9875\u9762\u624b\u52a8\u4e00\u952e\u89e6\u53d1\u6d4b\u8bd5\n\npermissions:\n  contents: write\n\njobs:\n  update-news:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Set up Python\n        uses: actions/setup-python@v5\n        with:\n          python-version: '3.11'\n\n      - name: Fetch news & summarize with AI\n        env:\n          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}\n        run: python update_news.py\n\n      - name: Commit and push updated news.json\n        run: |\n          git config user.name \"github-actions[bot]\"\n          git config user.email \"github-actions[bot]@users.noreply.github.com\"\n          git add news.json\n          git diff --staged --quiet || git commit -m \"chore: \u81ea\u52a8\u66f4\u65b0\u6bcf\u65e5 AI \u8d44\u8baf\u4e0e\u5f00\u6e90\u9879\u76ee\"\n          git push\n";
+
+      function downloadBlobFile(filename, content, mimeType) {
+        const blob = new Blob([content], { type: mimeType || 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('已下载 ' + filename);
+      }
+
+      document.getElementById('openGithubKitBtn').addEventListener('click', () => {
+        document.getElementById('githubKitModal').classList.remove('hidden');
+      });
+      document.getElementById('closeGithubKitBtn').addEventListener('click', () => {
+        document.getElementById('githubKitModal').classList.add('hidden');
+      });
+      document.getElementById('githubKitModal').addEventListener('click', e => {
+        if (e.target.id === 'githubKitModal') document.getElementById('githubKitModal').classList.add('hidden');
+      });
+      document.getElementById('dlIndexHtmlBtn').addEventListener('click', () => {
+        downloadBlobFile('index.html', '<!DOCTYPE html>\n' + document.documentElement.outerHTML, 'text/html;charset=utf-8');
+      });
+      document.getElementById('dlNewsJsonBtn').addEventListener('click', () => {
+        downloadBlobFile('news.json', JSON.stringify(state.cards, null, 2), 'application/json;charset=utf-8');
+      });
+      document.getElementById('dlUpdatePyBtn').addEventListener('click', () => {
+        downloadBlobFile('update_news.py', EMBEDDED_UPDATE_PY, 'text/x-python;charset=utf-8');
+      });
+      document.getElementById('dlWorkflowYmlBtn').addEventListener('click', () => {
+        downloadBlobFile('auto_update.yml', EMBEDDED_WORKFLOW_YML, 'text/yaml;charset=utf-8');
+      });
+      document.getElementById('copyWorkflowYmlBtn').addEventListener('click', () => {
+        copyText(EMBEDDED_WORKFLOW_YML);
+      });
+
+      // Init
+      loadState();
+      applyTheme();
+      populateEditionSelect();
+      renderBoard();
+      syncRemoteJson();
+    })();
+  </script>
+
+</body></html>

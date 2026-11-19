@@ -1,0 +1,371 @@
+[
+  {
+    "id": "20261118-01",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-18",
+    "category": "hot",
+    "lab": "OpenAI",
+    "funScore": 95,
+    "title": "GPT-6.2 Astra & Sol 登场，ChatGPT 语音也取消 10 分钟限制",
+    "funTake": "以前 AI 写代码像实习生，现在 Astra 和 Sol 连财务月结报表都接管了，连语音吐槽都能无限时长不断线！",
+    "summary": "OpenAI 于 11 月 17 日在 ChatGPT Work 和 Codex 桌面端推出 GPT-6.2 Astra（1.1M 上下文，定价 $8/$40 per 1M tokens，Opper Intelligence 62）与 GPT-6.2 Sol（1.1M 上下文，定价 $2/$10，Intelligence 57）。11 月 18 日紧接着上线 Live Dictation 实时语音听写并取消 10 分钟录音上限，同时发布可对账、开票、准备月结报表的 Accounting 插件。",
+    "sources": [
+      {
+        "label": "ChatGPT Release Notes",
+        "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes"
+      },
+      {
+        "label": "Opper AI 模型追踪",
+        "url": "https://opper.ai/model-releases"
+      }
+    ],
+    "status": "todo",
+    "starred": true,
+    "note": ""
+  },
+  {
+    "id": "20261118-02",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-16",
+    "category": "hot",
+    "lab": "Google DeepMind",
+    "funScore": 97,
+    "title": "Gemini 4 Hydrogen 发布：把 Google Sheets 玩成全动态像素画布",
+    "funTake": "谁能想到有一天电子表格能拿来放像素动画？Hydrogen 还用实时全球闪电数据做出了 3D 地球音乐盒！",
+    "summary": "Google 推出 Gemini 4 Hydrogen（1M 输入 / 高达 1M 输出，定价 $1.50/$7.50），默认 high 思考等级在 Artificial Analysis Intelligence Index 拿下 51 分（xhigh 达 54 分），比 Gemini 3.8 Flash 快 2.5 倍，Terminal-Bench 4.1 达 57%（对比 18.2%）。配合 Google Antigravity Orchestrator 自动调度模型，平均省 24% 配额、快 19%。",
+    "sources": [
+      {
+        "label": "Google 官方博客",
+        "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-hydrogen/"
+      }
+    ],
+    "status": "todo",
+    "starred": true,
+    "note": ""
+  },
+  {
+    "id": "20261118-03",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-18",
+    "category": "models",
+    "lab": "NVIDIA / ASUS / Dell / MSI",
+    "funScore": 91,
+    "title": "NVIDIA RTX Spark 迷你桌面主机开售：桌角本地跑 120B 模型",
+    "funTake": "以前跑 1200 亿参数模型得租机房，现在直接塞进显示器旁的小主机——就是 $4,699 起步的售价也很“核弹”。",
+    "summary": "11 月 18 日，NVIDIA 宣布华硕（ASUS ProArt GR1X）、戴尔与微星（MSI EdgeMesa N AI+）的 RTX Spark 紧凑型桌面 PC 正式开卖。搭载 20 核 Grace CPU + Blackwell RTX GPU（6,144 CUDA 核心）+ 最高 128GB 统一内存，号称支持本地 120B 参数模型与 90GB+ 3D 场景实时渲染。微星 64GB/1TB 版本标价 $4,699，128GB/4TB 标价 $7,999。",
+    "sources": [
+      {
+        "label": "NVIDIA 官方博客",
+        "url": "https://blogs.nvidia.com/blog/rtx-spark-desktop-local-ai-available-now/"
+      },
+      {
+        "label": "Superpower Daily 报道",
+        "url": "https://superpowerdaily.com/posts/nvidia-confirms-rtx-spark-desktop-sales-from-asus-dell-and-msi-for-local-ai"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-04",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-16",
+    "category": "models",
+    "lab": "Anthropic / Alibaba",
+    "funScore": 88,
+    "title": "11 月模型榜“神仙打架”：Claude Fable 5.2 与 Qwen4-Max 同台",
+    "funTake": "一边是 65 分旗舰拼智商天花板，一边是 $1.50 级选手拼性价比，11 月才过半已经发了 18 个新模型。",
+    "summary": "Opper AI 追踪显示 2026 年 11 月已记录 18 次模型发布：11 月 9 日 Anthropic 发布 Claude Fable 5.2（1M 上下文，Intelligence 65，定价 $8/$40）；11 月 16 日阿里发布 Qwen4-Max（1M 上下文，Intelligence 43，定价 $1.50/$4.50）；此前 10 月下旬还有 Moonshot Kimi K3.1 Pro 与 DeepSeek V4.1 Flash。",
+    "sources": [
+      {
+        "label": "Opper AI Release Tracker",
+        "url": "https://opper.ai/model-releases"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-05",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-17",
+    "category": "tools",
+    "lab": "开源社区 / GitHub",
+    "funScore": 93,
+    "title": "DeepSeek Harness 破 27.9 万星，100 行代码的 mini-SWE-agent 走红",
+    "funTake": "谁说 Agent 框架一定要写几万行？100 行 Python 配一个 Bash 终端，照样让大厂工程师天天拿来干活。",
+    "summary": "DataCamp 11 月盘点显示，DeepSeek Harness 自 8 月发布以来已达约 27.9 万 GitHub Stars，主打执行轨迹与工具调用透明化；mini-SWE-agent 核心代码仅约 100 行 Python，给模型开放 Bash 即可完成工程任务（约 9.5K Stars）。同期二进制逆向分析工具 REA 在 GitHub 也保持高热。",
+    "sources": [
+      {
+        "label": "DataCamp 盘点",
+        "url": "https://www.datacamp.com/blog/top-open-source-ai-agent-harnesses"
+      },
+      {
+        "label": "GitHub Trending 解析",
+        "url": "https://www.youtube.com/watch?v=Jh-4GPnur9A"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-06",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-09",
+    "category": "tools",
+    "lab": "MIT CSAIL & NYU",
+    "funScore": 94,
+    "title": "MIT 研发 FLEX：喊一句“别洒笔记本上”，机器人自己躲开手机",
+    "funTake": "机器人终于学会“举一反三”了！不用把家里每个贵重物品都写进代码，它自己就能悟出电子产品都怕水。",
+    "summary": "MIT CSAIL 与 NYU 团队推出 FLEX 机器人学习平台。当人对端咖啡的机械臂说“Don't spill on the laptop!”时，系统在约 5 秒内通过 Add → Generalize → Mask 三步流程，借助 LLM 常识推理出“液体会损坏所有电子产品”，从而自动绕开旁边的手机，也能举一反三避开易燃物与易碎品。",
+    "sources": [
+      {
+        "label": "MIT News 原文",
+        "url": "https://news.mit.edu/2026/ai-assisted-learning-platform-helps-robots-reason-beyond-literal-commands-1109"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-07",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-13",
+    "category": "fun",
+    "lab": "OpenAI",
+    "funScore": 92,
+    "title": "ChatGPT Wallet 上线：AI 代理挑好毛衣后直接刷 Face ID 结账",
+    "funTake": "AI 从“帮我写周报”正式进化到“帮我花钱”。唯一需要防备的是，以后逛网店可能连下单键都不用自己点了。",
+    "summary": "OpenAI 面向美国 18 岁以上 ChatGPT Pro 用户的“dots（常驻智能体）”推出 ChatGPT Wallet。用户在代理挑好商品或订好酒店后，核对商家与金额并通过 Face ID / Touch ID 生物识别授权，Wallet 会生成替代支付凭证完成结账，向商家与代理隐藏真实卡号同时保留信用卡积分。",
+    "sources": [
+      {
+        "label": "ChatGPT Release Notes",
+        "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-08",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-18",
+    "category": "fun",
+    "lab": "Microsoft / California",
+    "funScore": 84,
+    "title": "微软启动 AI 透明度倡议 & 加州推进 SB 813 强制安全标准",
+    "funTake": "AI 智能体在前面狂飙，企业合规和地方法规也在同步给它们装“安全带”和“红绿灯”。",
+    "summary": "11 月 17 日，微软联合多家跨行业机构发起 AI Transparency Initiative，强化企业对 AI 模型与智能体的信任；11 月 18 日，加州州长办公室公布落实 SB 813 独立 AI 监管与强制安全标准的下一步计划。",
+    "sources": [
+      {
+        "label": "Microsoft 新闻稿",
+        "url": "https://news.microsoft.com/source/2026/11/17/microsoft-and-organizations-across-industries-launch-ai-transparency-initiative-to-strengthen-enterprise-trust-in-ai-models-and-agents/"
+      },
+      {
+        "label": "加州州长办公室公告",
+        "url": "https://www.gov.ca.gov/2026/11/18/governor-newsoms-nation-leading-ai-safety-framework-is-getting-even-stronger-as-california-releases-next-steps-on-mandatory-safety-standards-and-oversight/"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-gh-01",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-18",
+    "category": "github",
+    "lab": "⭐ 394.8k Stars",
+    "metric": "394.8k Stars · 82.9k Forks",
+    "funScore": 98,
+    "title": "openclaw/openclaw：跨平台真正替你动手干活的 AI 智能体",
+    "funTake": "39.4 万星的开源界顶流，主打“不光动嘴聊天，而是直接在任何系统上帮你把活干了”。",
+    "summary": "这是一个跨操作系统（Any OS）的开源全能 AI 智能体项目，能够直接接管并执行跨平台的实际电脑操作任务。凭借高达 394.8k 的 GitHub Stars 和 82.9k Forks，它已成为开源社区最受关注的自主执行 Agent 代表之一。",
+    "sources": [
+      {
+        "label": "GitHub 仓库",
+        "url": "https://github.com/openclaw/openclaw"
+      }
+    ],
+    "status": "todo",
+    "starred": true,
+    "note": ""
+  },
+  {
+    "id": "20261118-gh-02",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-18",
+    "category": "github",
+    "lab": "⭐ 196.8k Stars",
+    "metric": "196.8k Stars · 14.9k Forks",
+    "funScore": 95,
+    "title": "microsoft/markitdown：把一切办公文档转成大模型最爱的 Markdown",
+    "funTake": "近 20 万星的刚需神器，喂给 AI 之前先用它洗一遍 PDF 和文档，效果立竿见影。",
+    "summary": "微软开源的 Python 文件转换工具（附带 CLI 与 MCP 服务），专门用于把 PDF、Office 文档等各类复杂文件快速转换成结构清晰的 Markdown 文本，方便大语言模型直接读取与分析。",
+    "sources": [
+      {
+        "label": "GitHub 仓库",
+        "url": "https://github.com/microsoft/markitdown"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-gh-03",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-18",
+    "category": "github",
+    "lab": "⭐ 184.4k Stars",
+    "metric": "184,492 Stars",
+    "funScore": 96,
+    "title": "ollama/ollama：一条命令在本地免费跑起最新开源大模型",
+    "funTake": "18.4 万星的本地 AI 装机必备，想自己白嫖跑模型基本绕不开它。",
+    "summary": "用 Go 语言编写的轻量级本地大模型运行工具，支持一条命令在个人电脑上部署并运行 Qwen、DeepSeek、GLM、Kimi 等热门开源模型，兼顾隐私与零 API 费用。",
+    "sources": [
+      {
+        "label": "AI 开源趋势榜参考",
+        "url": "https://github.com/duanyytop/agents-radar/issues/3936"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-gh-04",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-18",
+    "category": "github",
+    "lab": "⭐ 149.9k Stars",
+    "metric": "149.9k Stars · 25.2k Forks",
+    "funScore": 90,
+    "title": "langchain-ai/langchain：大模型应用与 Agent 工程的万能乐高积木",
+    "funTake": "14.9 万星的常青树底座，想把模型、知识库和工具链拼成完整应用就靠它。",
+    "summary": "老牌且持续进化的开源智能体工程平台，提供标准化的模型抽象、RAG 文档检索、记忆管理与工具调用编排框架，适合快速搭建生产级 LLM 应用。",
+    "sources": [
+      {
+        "label": "GitHub 仓库",
+        "url": "https://github.com/langchain-ai/langchain"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-gh-05",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-18",
+    "category": "github",
+    "lab": "🔥 今日 +1,917 Stars",
+    "metric": "今日飙升 +1,917 Stars",
+    "funScore": 94,
+    "title": "obra/superpowers：把开发流程变成 AI 可直接执行的“超能力技能包”",
+    "funTake": "今日狂涨近两千星的新晋黑马，让 AI 写代码不再东一榔头西一棒槌。",
+    "summary": "2026 年 11 月 18 日 GitHub 趋势榜增速最快的智能体技能（Agentic Skills）框架之一，将软件开发方法论封装成可组合、可执行的 AI 技能工作流。",
+    "sources": [
+      {
+        "label": "2026-11-18 趋势榜",
+        "url": "https://github.com/duanyytop/agents-radar/issues/4347"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-cn-01",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-17",
+    "category": "china",
+    "lab": "WorkBuddy",
+    "funScore": 91,
+    "title": "WorkBuddy 5.11.4 更新：定时任务与 Office/MCP 稳定性再升级",
+    "funTake": "打工人专属 AI 办公搭子把定时任务、Markdown 分块预览和高积分确认都打磨得更稳了。",
+    "summary": "WorkBuddy 于 11 月 17 日更新官方日志（含 5.11.4 等版本）：重点优化自定义侧栏与批量任务管理、定时任务重启/休眠补执行、高积分工具（图片/视频生成）使用前确认机制，并修复云端定时任务列表、Claw 跨设备同步及 Office/WPS 窗口协作问题。",
+    "sources": [
+      {
+        "label": "WorkBuddy 官方更新日志",
+        "url": "https://www.workbuddy.ai/docs/zh/workbuddy/Changelog"
+      }
+    ],
+    "status": "todo",
+    "starred": true,
+    "note": ""
+  },
+  {
+    "id": "20261118-cn-02",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-17",
+    "category": "china",
+    "lab": "字节跳动 · 豆包",
+    "funScore": 93,
+    "title": "豆包更新至 15.8.0，Seedance 2.0 视频生成模型全面免费开放",
+    "funTake": "不仅能写文案改代码，现在登录豆包还能直接免费玩 Seedance 2.0 做视频、让桌面端帮你操作电脑。",
+    "summary": "豆包客户端持续更新（Android 版于 2026 年 11 月 17 日更新至 15.8.0），并已全面接入 Seedance 2.0 视频生成模型供登录用户免费使用；豆包电脑版同时支持自主拆解任务、操作本地与云电脑、执行定时任务及调用 Seedream 系列生成图文。",
+    "sources": [
+      {
+        "label": "豆包官网",
+        "url": "https://www.doubao.com/"
+      },
+      {
+        "label": "豆包电脑版",
+        "url": "https://www.doubao.com/download/desktop"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  },
+  {
+    "id": "20261118-cn-03",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-13",
+    "category": "china",
+    "lab": "DeepSeek",
+    "funScore": 94,
+    "title": "DeepSeek 发布 Full-Suite App API，V4.1-Flash-1017 同步全端上线",
+    "funTake": "主打“许愿式编程一键成真”，还坚持闲时半价的峰谷定价，性价比党狂喜。",
+    "summary": "2026 年 11 月 13 日 DeepSeek 更新日志显示发布 Full-Suite App API；此前 DeepSeek V4.1 Flash 已升级至开源权重版本 V4.1-Flash-1017（官方网页端、App 与 API 同步切换），并继续保留 DeepSeek V4 Pro API 调用与闲时半价政策。",
+    "sources": [
+      {
+        "label": "DeepSeek 官方更新日志",
+        "url": "https://api-docs.deepseek.com/zh-cn/updates/"
+      },
+      {
+        "label": "V4.1-Flash-1017 发布公告",
+        "url": "https://api-docs.deepseek.com/zh-cn/news/news261017"
+      }
+    ],
+    "status": "todo",
+    "starred": true,
+    "note": ""
+  },
+  {
+    "id": "20261118-cn-04",
+    "edition": "2026-11-18 晚间首发版",
+    "date": "2026-11-16",
+    "category": "china",
+    "lab": "阿里 / 腾讯 / 月之暗面",
+    "funScore": 89,
+    "title": "国产大模型 11 月连发：Qwen4-Max 百万上下文仅 $1.50，腾讯 Hy4 登场",
+    "funTake": "百万上下文直接打到白菜价，国产模型在长文本和价格战上依然卷得飞起。",
+    "summary": "Opper AI 追踪显示：11 月 16 日阿里发布 Qwen4-Max（1M 上下文，输入/输出定价 $1.50/$4.50），11 月 3 日腾讯推出 Tencent Hy4；此前 10 月下旬月之暗面发布 Kimi K3.1 Pro（328K 上下文），国产主力模型持续密集迭代。",
+    "sources": [
+      {
+        "label": "Opper AI 模型追踪",
+        "url": "https://opper.ai/model-releases"
+      }
+    ],
+    "status": "todo",
+    "starred": false,
+    "note": ""
+  }
+]
