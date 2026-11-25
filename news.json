@@ -1,5 +1,22 @@
 [
   {
+    "id": "2026-11-25-gh-3",
+    "edition": "2026-11-25 早报 (09:00)",
+    "date": "2026-11-25",
+    "category": "github",
+    "lab": "⭐ 325,865 Stars",
+    "funScore": 92,
+    "title": "obra/superpowers：高热度 AI 开源项目",
+    "funTake": "收获 325,865 Stars 与 28,910 Forks 的热门开源仓库。",
+    "summary": "项目简介：An agentic skills framework & software development methodology that works.（GitHub 收藏数：325,865 Stars）。",
+    "sources": [
+      {
+        "label": "GitHub 仓库",
+        "url": "https://github.com/obra/superpowers"
+      }
+    ]
+  },
+  {
     "id": "2026-11-19-gh-1",
     "edition": "2026-11-19 晚报 (20:00)",
     "date": "2026-11-19",
